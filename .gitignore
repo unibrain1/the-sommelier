@@ -1,0 +1,25 @@
+# Secrets
+.env
+
+# Generated data
+data/
+
+# Python
+__pycache__/
+*.pyc
+
+# MCP / Playwright
+.playwright-mcp/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+.docker/
+
+# Sample files
+sample.html

@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wine Drinking Plan 2026–2028</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8f5f0;
+  --surface: #ffffff;
+  --surface-alt: #f0ece4;
+  --border: #dfd7ca;
+  --border-strong: #c5bdb0;
+  --heading: #3e3f3a;
+  --text: #3e3f3a;
+  --muted: #8e8c84;
+  --accent: #325d88;
+  --accent-light: #d6dfe7;
+  --urgent: #d9534f;
+  --urgent-bg: #f7dddc;
+  --evolution: #29abe0;
+  --evolution-bg: #d4eef9;
+  --special-bg: #f5f1e8;
+  --sparkling: #29abe0;
+  --rose: #e83e8c;
+  --white-wine: #c49b2a;
+  --red-wine: #8b3a3a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 52px 48px 44px;
+}
+
+.eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--heading);
+  letter-spacing: -0.01em;
+}
+
+h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+.header-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 10px;
+  letter-spacing: 0.1px;
+}
+
+.header-updated {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.stats {
+  display: flex;
+  gap: 0;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  padding-right: 32px;
+  margin-right: 32px;
+  border-right: 1px solid var(--border);
+}
+
+.stat:last-child {
+  border-right: none;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--accent);
+  line-height: 1;
+  display: block;
+  letter-spacing: -0.02em;
+}
+
+.stat-lbl {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Tabs */
+.year-tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.year-tabs::-webkit-scrollbar { display: none; }
+
+.year-tab {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.year-tab:hover { color: var(--heading); }
+.year-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding: 14px 48px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-alt);
+}
+
+.legend.hidden { display: none; }
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Filter bar */
+.controls {
+  padding: 12px 48px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+}
+
+.controls.hidden { display: none; }
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 0 16px;
+  height: 34px;
+  min-height: 34px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.filter-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Quarters */
+.quarter { padding: 48px 48px 0; }
+
+.quarter-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.quarter-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--heading);
+  letter-spacing: -0.01em;
+}
+
+.quarter-sub {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.quarter-note {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--muted);
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+}
+
+/* Grid */
+.weeks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding-bottom: 48px;
+}
+
+/* Cards */
+.week-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 22px 18px;
+  transition: box-shadow 0.18s, transform 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+
+.week-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.week-card.urgent {
+  border-left: 4px solid var(--urgent);
+}
+
+.week-card.special {
+  border-left: 4px solid var(--accent);
+}
+
+.week-card.evolution-card {
+  border-left: 4px solid var(--evolution);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.week-num {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.week-date {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 12px;
+}
+
+.badge svg { flex-shrink: 0; }
+
+.badge-sparkling { background: #e8f5fb; color: var(--sparkling); }
+.badge-rose      { background: #fce4ef; color: var(--rose); }
+.badge-white     { background: #f7f0dc; color: var(--white-wine); }
+.badge-red       { background: #f5e8e8; color: var(--red-wine); }
+
+.wine-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--heading);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.wine-vintage {
+  color: var(--accent);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.wine-appellation {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.wine-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  font-size: 14px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.meta-item span {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.occasion-tag {
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.occasion-tag::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.urgent-flag {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--urgent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.urgent-flag::before { content: '⚠'; font-size: 10px; }
+
+.evolution-flag {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--evolution);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.evolution-flag::before { content: '◉'; font-size: 10px; }
+
+.note-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 12px;
+  line-height: 1.65;
+  border-left: 2px solid var(--border-strong);
+  padding-left: 10px;
+}
+
+/* Calendar view */
+#calendar-view {
+  display: none;
+  padding: 48px;
+}
+
+#calendar-view.visible { display: block; }
+
+.cal-year-header {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--heading);
+  margin: 0 0 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  letter-spacing: -0.01em;
+}
+
+.cal-year-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 56px;
+}
+
+.cal-month {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cal-month-header {
+  background: var(--surface-alt);
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.cal-month-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--heading);
+}
+
+.cal-month-count {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.cal-entries { padding: 4px 0; }
+
+.cal-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.13s;
+}
+
+.cal-entry:last-child { border-bottom: none; }
+.cal-entry:hover { background: var(--surface-alt); }
+
+.cal-week-pill {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.cal-week-pill.urgent-pill    { background: var(--urgent-bg); color: var(--urgent); border-color: #f5c6c4; }
+.cal-week-pill.special-pill   { background: var(--accent-light); color: var(--accent); border-color: #e8c8d0; }
+.cal-week-pill.evolution-pill { background: var(--evolution-bg); color: var(--evolution); border-color: #c0d8ef; }
+
+.cal-type-dot {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.cal-entry-body { flex: 1; min-width: 0; }
+
+.cal-entry-date {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.cal-entry-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--heading);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cal-entry-vintage { color: var(--accent); font-style: italic; font-weight: 400; }
+
+.cal-entry-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.cal-entry-flags {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+
+.cal-flag {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 100px;
+}
+
+.cal-flag.urgent    { background: var(--urgent-bg); color: var(--urgent); }
+.cal-flag.special   { background: var(--accent-light); color: var(--accent); }
+.cal-flag.evolution { background: var(--evolution-bg); color: var(--evolution); }
+.cal-flag.occasion  { background: #f5edd8; color: var(--white-wine); }
+
+/* What Changed view */
+#changelog-view {
+  display: none;
+  padding: 48px;
+}
+
+#changelog-view.visible { display: block; }
+
+.changelog-header-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 28px 32px;
+  margin-bottom: 36px;
+  max-width: 720px;
+}
+
+.changelog-header-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--heading);
+  margin-bottom: 8px;
+}
+
+.changelog-date {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.changelog-summary {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.changelog-section {
+  margin-bottom: 32px;
+}
+
+.changelog-section-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.changelog-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.changelog-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.changelog-item.added   { background: #e9f3db; border-color: #c5e09a; }
+.changelog-item.fixed   { background: #fde5d8; border-color: #f9b78e; }
+.changelog-item.removed { background: #f7dddc; border-color: #ecb1af; }
+
+.changelog-week-pill {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.changelog-item.added   .changelog-week-pill { background: #c5e09a; color: #3b4f1e; }
+.changelog-item.fixed   .changelog-week-pill { background: #f9b78e; color: #623218; }
+.changelog-item.removed .changelog-week-pill { background: #ecb1af; color: #572120; }
+
+.changelog-type-badge {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 100px;
+}
+
+.changelog-item.added   .changelog-type-badge { background: #c5e09a; color: #3b4f1e; }
+.changelog-item.fixed   .changelog-type-badge { background: #f9b78e; color: #623218; }
+.changelog-item.removed .changelog-type-badge { background: #ecb1af; color: #572120; }
+
+.changelog-description {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.55;
+  flex: 1;
+}
+
+/* Footer */
+footer {
+  margin-top: 48px;
+  padding: 32px 48px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-alt);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+footer strong { color: var(--text); font-weight: 600; }
+
+/* Empty state */
+.empty-state {
+  padding: 64px 48px;
+  color: var(--muted);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+}
+
+/* Plan view */
+#plan-view { display: block; }
+#plan-view.hidden { display: none; }
+
+/* Responsive — mobile */
+@media (max-width: 640px) {
+  header { padding: 32px 16px 28px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .stat {
+    border-right: none;
+    margin-right: 0;
+    padding-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  .stat:nth-child(3),
+  .stat:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .year-tabs { padding: 0 16px; }
+  .legend    { padding: 12px 16px; }
+  .controls  { padding: 10px 16px; }
+  .quarter   { padding: 28px 16px 0; }
+  .quarter-note { display: none; }
+
+  .weeks-grid { grid-template-columns: 1fr; gap: 12px; padding-bottom: 28px; }
+
+  #calendar-view  { padding: 16px; }
+  #changelog-view { padding: 16px; }
+  .cal-grid { grid-template-columns: 1fr; }
+
+  .changelog-header-card { padding: 20px; }
+  footer { padding: 24px 16px; }
+  .empty-state { padding: 40px 16px; }
+}
+
+/* Responsive — tablet */
+@media (min-width: 641px) and (max-width: 768px) {
+  header { padding: 40px 28px 36px; }
+  .year-tabs { padding: 0 28px; }
+  .legend    { padding: 12px 28px; }
+  .controls  { padding: 12px 28px; }
+  .quarter   { padding: 36px 28px 0; }
+  #calendar-view  { padding: 28px; }
+  #changelog-view { padding: 28px; }
+}
+
+/* Pairing indicator on cards */
+.pairing-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pairing-row.good {
+  background: #e9f3db;
+  border: 1px solid #c5e09a;
+  color: #3b4f1e;
+}
+
+.pairing-row.sommelier {
+  background: var(--accent-light);
+  border: 1px solid var(--accent);
+  color: #142536;
+}
+
+.pairing-row.partial {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+
+.pairing-row .pairing-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.pairing-row .pairing-meal {
+  font-weight: 600;
+}
+
+.pairing-row .pairing-detail {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.legend-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  align-items: center;
+}
+
+.legend-separator {
+  width: 1px;
+  height: 18px;
+  background: var(--border-strong);
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Cellar &middot; 2026&ndash;2028</div>
+  <h1>A Three-Year <em>Drinking Plan</em></h1>
+  <div class="header-sub">104-week plan &nbsp;&middot;&nbsp; One bottle per week &nbsp;&middot;&nbsp; March 2026 &ndash; March 2028</div>
+  <div class="header-updated">Last updated: March 22, 2026</div>
+  <div class="stats">
+    <div class="stat"><span class="stat-num">104</span><span class="stat-lbl">Bottles Planned</span></div>
+    <div class="stat"><span class="stat-num">15</span><span class="stat-lbl">Urgent / Past Peak</span></div>
+    <div class="stat"><span class="stat-num">6</span><span class="stat-lbl">Evolution Tastings</span></div>
+    <div class="stat"><span class="stat-num">~118</span><span class="stat-lbl">Remaining After Yr 2</span></div>
+  </div>
+</header>
+
+<div class="year-tabs">
+  <button class="year-tab active" onclick="switchYear('y1', this)">Year 1 &middot; 2026&ndash;2027</button>
+  <button class="year-tab" onclick="switchYear('y2', this)">Year 2 &middot; 2027&ndash;2028</button>
+  <button class="year-tab" onclick="switchYear('all', this)">All 104 Weeks</button>
+  <button class="year-tab" onclick="switchYear('cal', this)">Monthly Calendar</button>
+  <button class="year-tab" onclick="switchYear('changes', this)">What Changed</button>
+</div>
+
+<div class="legend" id="legend-bar">
+  <div class="legend-group">
+    <div class="legend-item" id="legend-sparkling"></div>
+    <div class="legend-item" id="legend-rose"></div>
+    <div class="legend-item" id="legend-white"></div>
+    <div class="legend-item" id="legend-red"></div>
+  </div>
+  <div class="legend-separator"></div>
+  <div class="legend-group">
+    <div class="legend-item"><div class="dot" style="width:3px;height:16px;border-radius:2px;background:var(--urgent)"></div>Urgent / Past Peak</div>
+    <div class="legend-item"><div class="dot" style="width:3px;height:16px;border-radius:2px;background:var(--accent)"></div>Special Occasion</div>
+    <div class="legend-item"><div class="dot" style="width:3px;height:16px;border-radius:2px;background:var(--evolution)"></div>Evolution Track</div>
+    <div class="legend-separator"></div>
+    <div class="legend-item"><div class="dot" style="background:#93c54b"></div>Pairs Well</div>
+    <div class="legend-item"><div class="dot" style="background:var(--accent)"></div>Sommelier Pick</div>
+    <div class="legend-item"><div class="dot" style="background:var(--border-strong)"></div>No Match</div>
+  </div>
+</div>
+
+<div class="controls" id="filter-bar">
+  <button class="filter-btn active" onclick="applyFilter('all', this)">All</button>
+  <button class="filter-btn" onclick="applyFilter('urgent', this)">Urgent</button>
+  <button class="filter-btn" onclick="applyFilter('special', this)">Special</button>
+  <button class="filter-btn" onclick="applyFilter('evolution', this)">Evolution</button>
+  <div class="filter-divider"></div>
+  <button class="filter-btn" onclick="applyFilter('spring', this)">Spring</button>
+  <button class="filter-btn" onclick="applyFilter('summer', this)">Summer</button>
+  <button class="filter-btn" onclick="applyFilter('fall', this)">Fall</button>
+  <button class="filter-btn" onclick="applyFilter('winter', this)">Winter</button>
+</div>
+
+<div id="plan-view">
+  <div id="plan"></div>
+</div>
+
+<div id="calendar-view"></div>
+
+<div id="changelog-view"></div>
+
+
+<script>
+// ALL 104 WEEKS
+const allWeeks = [
+  // YEAR 1: March 2026 - March 2027
+  // SPRING 2026
+  { week:1,  year:1, date:"Mar 16, 2026", season:"spring", badge:"red",      vintage:"2007", name:"Dion Vineyard Pinot Noir",                        appellation:"Oregon · Willamette Valley · McMinnville",        window:"2011–2018", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Well past peak — open with curiosity. May show tertiary earthiness or be fading. Cook with it if needed." },
+  { week:2,  year:1, date:"Mar 23, 2026", season:"spring", badge:"white",    vintage:"2005", name:"Stangeland Gewürztraminer",                   appellation:"Oregon · Willamette Valley · Eola-Amity Hills",   window:"2006–2009", score:"CT80",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"Two decades past peak. Tropical oxidation or maderization likely. Worth the experience." },
+  { week:3,  year:1, date:"Mar 30, 2026",  season:"spring", badge:"white",    vintage:"2008", name:"Domaine Thibert Pouilly-Fuissé Vignes Blanches", appellation:"France · Burgundy · Mâconnais",             window:"2012–2015", score:"CT90",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"Decade-plus past window. Oxidized white Burgundy can surprise — nutty, honeyed — or disappoint. Open with dinner." },
+  { week:4,  year:1, date:"Apr 6, 2026", season:"spring", badge:"red",      vintage:"2010", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2014–2018", score:"CT90.3", urgent:true,  special:false, evolution:false, occasion:null,                  note:"8 years past peak. May still show secondary complexity — dried fruit, forest floor, light tannin." },
+  { week:5,  year:1, date:"Apr 13, 2026", season:"spring", badge:"red",      vintage:"2014", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2018–2022", score:"CT90.5", urgent:true,  special:false, evolution:false, occasion:null,                  note:"4 years past peak. Likely still pleasurable — should show tertiary complexity." },
+  { week:6,  year:1, date:"Apr 20, 2026", season:"spring", badge:"rose",     vintage:"2021", name:"Dion Vineyard Rosé of Pinot Noir",            appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2022–2023", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"3 years past window. Rosé fades quickly — drink paired with a light meal and manage expectations." },
+  { week:7,  year:1, date:"Apr 27, 2026",  season:"spring", badge:"rose",     vintage:"2021", name:"Domaine Drouhin Oregon Pinot Noir Édition Rosé", appellation:"Oregon · Willamette Valley · Dundee Hills", window:"2022–2024", score:"CT90",   urgent:true,  special:false, evolution:false, occasion:null,                  note:"Past window but a quality producer — may still be pleasant. Chill well." },
+  { week:8,  year:1, date:"May 4, 2026", season:"spring", badge:"red",      vintage:"2017", name:"Domaine Drouhin Oregon Pinot Noir Édition Limitée", appellation:"Oregon · Willamette Valley · Dundee Hills", window:"2021–2027", score:"CT94.5", urgent:true, special:true,  evolution:false, occasion:null,                  note:"CT94.5 and window closes 2027 — highest-rated urgent bottle in the cellar. Decant 30 minutes." },
+  { week:9,  year:1, date:"May 11, 2026", season:"spring", badge:"rose",     vintage:"2020", name:"Campo Viejo Tempranillo Rioja Rosado",            appellation:"Spain · La Rioja · Rioja",                        window:"2022–2025", score:"CT83",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"At the end of its window. Drink this spring before it fades further." },
+  { week:10, year:1, date:"May 18, 2026", season:"spring", badge:"rose",     vintage:"2022", name:"Adamant Cellars Counoise Ruby Ruth",              appellation:"USA · Washington · Columbia Valley",              window:"2023–2025", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"At the tail of its window. Lovely for a warm late-May evening." },
+  // SUMMER 2026
+  { week:11, year:1, date:"May 25, 2026",  season:"summer", badge:"rose",     vintage:"2024", name:"Whispering Angel",                                appellation:"France · Provence · Côtes de Provence",       window:"2024–2027", score:"CT88.8", urgent:false, special:false, evolution:false, occasion:"Summer opener",        note:"Classic summer Provence rosé. Peak now." },
+  { week:12, year:1, date:"Jun 1, 2026",  season:"summer", badge:"white",    vintage:"2021", name:"Dion Vineyard Pinot Gris",                        appellation:"Oregon · Willamette Valley",                           window:"2022–2024", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"End of window — open now before summer heat pushes it further." },
+  { week:13, year:1, date:"Jun 8, 2026", season:"summer", badge:"rose",     vintage:"2023", name:"Dion Vineyard Rosé of Pinot Noir",            appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2024–2025", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Past its recommended window. Drink now while summer makes it worth it." },
+  { week:14, year:1, date:"Jun 15, 2026", season:"summer", badge:"white",    vintage:"2022", name:"Dion Vineyard Pinot Gris",                        appellation:"Oregon · Willamette Valley",                           window:"2023–2025", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Last year of window. Light and refreshing for summer." },
+  { week:15, year:1, date:"Jun 22, 2026", season:"summer", badge:"white",    vintage:"2021", name:"Adamant Cellars Bijoux",                          appellation:"USA · Washington · Columbia Valley",              window:"2021–2024", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Sémillon-Sauvignon Blanc blend past its window. Likely still good — waxy, honeyed texture." },
+  { week:16, year:1, date:"Jun 29, 2026",  season:"summer", badge:"sparkling",vintage:"2015", name:"Veuve Clicquot Champagne Brut Vintage",           appellation:"France · Champagne",                                   window:"2024–2030", score:"CT91",    urgent:false, special:true,  evolution:false, occasion:"4th of July weekend",  note:"In peak window. Perfect for a summer celebration." },
+  { week:17, year:1, date:"Jul 6, 2026", season:"summer", badge:"rose",     vintage:"2023", name:"Les Quatre Tours Vilandria",                      appellation:"France · Provence · Coteaux d'Aix-en-Provence",   window:"2024–2028", score:"CT89",    urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak drinking. A more complex, food-friendly Provence alternative." },
+  { week:18, year:1, date:"Jul 13, 2026", season:"summer", badge:"white",    vintage:"2024", name:"Fratelli Pighin Pinot Grigio",                    appellation:"Italy · Friuli Grave",                                 window:"2025–2027", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Light, crisp Friulian Pinot Grigio — ideal summer patio wine." },
+  { week:19, year:1, date:"Jul 20, 2026", season:"summer", badge:"white",    vintage:"2023", name:"Adamant Cellars Albariño Philips Vineyard", appellation:"USA · Washington · Walla Walla Valley",         window:"2024–2027", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. Citrusy and saline — great with seafood." },
+  { week:20, year:1, date:"Jul 27, 2026",  season:"summer", badge:"rose",     vintage:"2024", name:"Stoller Pinot Noir Rosé",                     appellation:"Oregon · Willamette Valley",                           window:"2025–2027", score:"CT90",    urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak now. Oregon rosé with more body — pairs beautifully with grilled salmon." },
+  { week:21, year:1, date:"Aug 3, 2026", season:"summer", badge:"white",    vintage:"2024", name:"Fratelli Pighin Pinot Grigio",                    appellation:"Italy · Friuli Grave",                                 window:"2025–2027", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Second of two — perfectly at home in August." },
+  { week:22, year:1, date:"Aug 10, 2026", season:"summer", badge:"rose",     vintage:"2023", name:"Marqués de Cáceres Rioja Rosado",        appellation:"Spain · La Rioja · Rioja",                        window:"2025–2027", score:"CT87.5", urgent:false, special:false, evolution:false, occasion:null,                  note:"Enters drinking window now. Tempranillo rosé — more structured than Provence." },
+  { week:23, year:1, date:"Aug 17, 2026", season:"summer", badge:"white",    vintage:"2022", name:"Ridgecrest Grüner Veltliner",                 appellation:"Oregon · Willamette Valley · Ribbon Ridge",       window:"2023–2026", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"End of its window. Grüner pairs perfectly with late-summer vegetables." },
+  { week:24, year:1, date:"Aug 24, 2026", season:"summer", badge:"red",      vintage:"2017", name:"Dion Vineyard Tempranillo",                       appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2020–2023", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Past its window. Open for a late-summer dinner — may still show earthy, dark fruit." },
+  // FALL 2026
+  { week:25, year:1, date:"Aug 31, 2026",  season:"fall", badge:"red",        vintage:"2016", name:"Dion Vineyard Lost and Found Rosé",           appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:null,             score:null,      urgent:true,  special:false, evolution:false, occasion:"Fall opener",          note:"10-year-old rosé blend. Could be fascinating or faded. First of three — try one now." },
+  { week:26, year:1, date:"Sep 7, 2026", season:"fall", badge:"red",        vintage:"2015", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2019–2023", score:"CT90",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"3 years past window. First of two — drink now." },
+  { week:27, year:1, date:"Sep 14, 2026", season:"fall", badge:"red",        vintage:"2016", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2020–2024", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"2 years past window. First of two. Likely still showing well." },
+  { week:28, year:1, date:"Sep 21, 2026", season:"fall", badge:"red",        vintage:"2020", name:"Cantina Zaccagnini Montepulciano d'Abruzzo",      appellation:"Italy · Abruzzi",                                     window:"2023–2026", score:"CT87.9", urgent:true,  special:false, evolution:false, occasion:null,                  note:"End of window this year. Rustic and hearty — great with autumn pasta." },
+  { week:29, year:1, date:"Sep 28, 2026",  season:"fall", badge:"red",        vintage:"2021", name:"Cecilia Beretta Bardolino Classico",              appellation:"Italy · Veneto · Bardolino Classico",             window:null,             score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Lighter Italian red — Bardolino drinks young and fresh. Good autumn weeknight bottle." },
+  { week:30, year:1, date:"Oct 5, 2026", season:"fall", badge:"red",        vintage:"2018", name:"Adamant Cellars Nalin",                           appellation:"USA · Washington · Walla Walla Valley",           window:"2023–2027", score:"CT87",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"In its window now. Red Bordeaux blend — good for fall evenings." },
+  { week:31, year:1, date:"Oct 12, 2026", season:"fall", badge:"red",        vintage:"2018", name:"Hedges Family Estate Red Mountain",               appellation:"USA · Washington · Red Mountain",                 window:"2022–2028", score:"CT91.6", urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. Red Bordeaux blend from Washington's top AVA — brooding and structured." },
+  { week:32, year:1, date:"Oct 19, 2026", season:"fall", badge:"red",        vintage:"2018", name:"The Feminist Party GSM",                          appellation:"USA · California · Santa Barbara County",         window:"2021–2028", score:"CT91",    urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. Grenache-Syrah-Mourvèdre — spice and dark fruit. Decant 30 min." },
+  { week:33, year:1, date:"Oct 26, 2026",  season:"fall", badge:"red",        vintage:"2019", name:"Tertre du Moulin St. Émilion Grand Cru",      appellation:"France · Bordeaux · St. Émilion",            window:"2024–2028", score:"CT88.7", urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. Right Bank Bordeaux with Merlot richness — great with autumn roasts." },
+  { week:34, year:1, date:"Nov 2, 2026",  season:"fall", badge:"red",        vintage:"2019", name:"Reynvaan Syrah In the Rocks",                     appellation:"USA · Washington · Walla Walla Valley",           window:"2024–2031", score:"CT91.3", urgent:false, special:false, evolution:false, occasion:null,                  note:"Entering peak now. Walla Walla Syrah at its most mineral — decant well." },
+  { week:35, year:1, date:"Nov 9, 2026", season:"fall", badge:"red",        vintage:"2019", name:"Adamant Cellars Syrah Artisan",                   appellation:"USA · Washington · Walla Walla Valley",           window:"2023–2028", score:"CT92",    urgent:false, special:false, evolution:false, occasion:null,                  note:"In window. CT92 — first of two 2019 Artisan Syrahs. Compare with the 2020 later." },
+  { week:36, year:1, date:"Nov 16, 2026", season:"fall", badge:"red",        vintage:"2018", name:"Domaine Drouhin Oregon Pinot Noir Laurène",   appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2022–2031", score:"CT92.1", urgent:false, special:true,  evolution:true,  occasion:"Thanksgiving week",    note:"Evolution track — Laurène Year 1. 2018 in peak window. 7 bottles remain; open one to benchmark." },
+  { week:37, year:1, date:"Nov 23, 2026", season:"fall", badge:"red",        vintage:"2019", name:"Reynvaan Family Vineyards Syrah In the Hills",    appellation:"USA · Washington · Walla Walla Valley",           window:"2024–2032", score:"CT92.9", urgent:false, special:true,  evolution:false, occasion:null,                  note:"Peak and highly rated. Reynvaan's flagship — pair with roasted lamb or short ribs." },
+  // WINTER 2026-27
+  { week:38, year:1, date:"Nov 30, 2026",  season:"winter", badge:"red",      vintage:"2012", name:"Barreri & Rovati Barolo Riserva",                 appellation:"Italy · Piedmont · Barolo",                       window:"2021–2027", score:"CT86",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"End of window approaching. 14-year-old Barolo Riserva — tertiary notes of tar, rose, leather." },
+  { week:39, year:1, date:"Dec 7, 2026", season:"winter", badge:"red",      vintage:"2019", name:"Renzo Seghesio Langhe Ars Vivendi",               appellation:"Italy · Piedmont · Langhe DOC",                   window:"2024–2028", score:"CT90.4", urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. Elegant Piedmont red — pairs beautifully with braised meats." },
+  { week:40, year:1, date:"Dec 14, 2026", season:"winter", badge:"red",      vintage:"2019", name:"Domaine Drouhin Oregon Pinot Noir Louise",        appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2023–2031", score:"CT92.7", urgent:false, special:true,  evolution:true,  occasion:"Holiday dinner",       note:"Evolution track — Louise Year 1. 2019 squarely in peak window. 3 bottles remain." },
+  { week:41, year:1, date:"Dec 21, 2026", season:"winter", badge:"sparkling",vintage:"2019", name:"Dion Vineyard Marie Grace",                       appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:null,             score:null,      urgent:false, special:true,  evolution:false, occasion:"New Year's Eve",       note:"Méthode traditionnelle Oregon sparkling — perfect for ringing in 2027." },
+  { week:42, year:1, date:"Dec 28, 2026",  season:"winter", badge:"red",      vintage:"2019", name:"Trader Joe's Pauillac Diamond Reserve",           appellation:"France · Bordeaux · Pauillac",                    window:"2024–2033", score:"CT87.6", urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. Left Bank Bordeaux — classic January brooding red." },
+  { week:43, year:1, date:"Jan 4, 2027", season:"winter", badge:"red",      vintage:"2018", name:"Adamant Cellars Cabernet Sauvignon Don't Be a Dull Boy", appellation:"USA · Washington · Walla Walla Valley", window:"2023–2029", score:"CT93",    urgent:false, special:true,  evolution:false, occasion:null,                  note:"Highly rated and in peak window. CT93 — Washington Cab at its finest." },
+  { week:44, year:1, date:"Jan 11, 2027", season:"winter", badge:"red",      vintage:"2020", name:"Adamant Cellars Cabernet Franc",                  appellation:"USA · Washington · Columbia Valley",              window:"2024–2030", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"In peak window. First of two Cab Francs — floral, structured." },
+  { week:45, year:1, date:"Jan 18, 2027", season:"winter", badge:"red",      vintage:"2017", name:"Cascina Adelaide Barolo Fossati",                 appellation:"Italy · Piedmont · Barolo",                       window:"2025–2035", score:"CT90",    urgent:false, special:true,  evolution:false, occasion:null,                  note:"Just entering its drinking window. Serious Barolo — decant 2 hours." },
+  { week:46, year:1, date:"Jan 25, 2027",  season:"winter", badge:"red",      vintage:"2020", name:"Cline Cellars Zinfandel Ancient Vines",           appellation:"USA · California · Contra Costa County",          window:"2022–2027", score:"CT86.8", urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. Old-vine Zin — jammy, brambly. Great with pizza on a cold night." },
+  { week:47, year:1, date:"Feb 1, 2027",  season:"winter", badge:"red",      vintage:"2023", name:"Drouhin Oregon Roserock Pinot Noir",              appellation:"Oregon · Willamette Valley · Eola-Amity Hills",   window:"2025–2055", score:"CT91.2", urgent:false, special:true,  evolution:true,  occasion:"Valentine's week",     note:"Evolution track — Roserock Year 1. 2023 newly in window — benchmark the young expression." },
+  { week:48, year:1, date:"Feb 8, 2027", season:"winter", badge:"red",      vintage:"2015", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2019–2023", score:"CT90",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"Second of two 2015 WR — drink up." },
+  { week:49, year:1, date:"Feb 15, 2027", season:"winter", badge:"red",      vintage:"2018", name:"Dion Vineyard Pinot Noir 115W",                   appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2021–2026", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"End of window in 2026. Single bottle — drink now." },
+  { week:50, year:1, date:"Feb 22, 2027",  season:"winter", badge:"red",      vintage:"2018", name:"Dion Vineyard Pinot Noir Hang Time",              appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2021–2026", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"End of window this year. First of two Hang Times — open and assess." },
+  { week:51, year:1, date:"Mar 1, 2027",  season:"winter", badge:"red",      vintage:"2016", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2020–2024", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Second of two 2016 WR — 2 years past window but likely still lovely." },
+  { week:52, year:1, date:"Mar 8, 2027", season:"winter", badge:"red",      vintage:"2013", name:"Domaine Drouhin Oregon Pinot Noir Louise",        appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2017–2027", score:"CT93",    urgent:true,  special:true,  evolution:false, occasion:"Year 1 finale",        note:"Last year of window. CT93 and a single bottle — end Year 1 with something worthy." },
+  // YEAR 2: March 2027 - March 2028
+  // SPRING 2027
+  { week:53, year:2, date:"Mar 15, 2027", season:"spring", badge:"red",      vintage:"2018", name:"Dion Vineyard Pinot Noir Hang Time",              appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2021–2026", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Second of two Hang Times — a year past window. Open alongside notes from Week 50 to compare." },
+  { week:54, year:2, date:"Mar 22, 2027", season:"spring", badge:"red",      vintage:"2018", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2022–2026", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"End of window. First of two 2018 WRs — drink now before further decline." },
+  { week:55, year:2, date:"Mar 29, 2027",  season:"spring", badge:"red",      vintage:"2019", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2023–2027", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Last year of window. First of two 2019 WRs — open now and take notes for the second bottle." },
+  { week:56, year:2, date:"Apr 5, 2027", season:"spring", badge:"red",      vintage:"2016", name:"Dion Vineyard Lost and Found Rosé",           appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:null,             score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Second of three Lost and Found Rosés. 11-year-old blend — fascinating study in aged rosé." },
+  { week:57, year:2, date:"Apr 12, 2027", season:"spring", badge:"red",      vintage:"2020", name:"Dion Vineyard Pinot Noir",                        appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2023–2027", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Last year of window. First of two 2020 Dion PNs — open now and compare with the second later." },
+  { week:58, year:2, date:"Apr 19, 2027", season:"spring", badge:"red",      vintage:"2018", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2022–2026", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Second of two 2018 WRs. Compare with Week 54 — note any difference opened a month apart." },
+  { week:59, year:2, date:"Apr 26, 2027",  season:"spring", badge:"white",    vintage:"2020", name:"Résonance Chardonnay Découverte Vineyard", appellation:"Oregon · Willamette Valley · Dundee Hills",      window:"2023–2028", score:"CT90.8", urgent:false, special:false, evolution:false, occasion:null,                  note:"In peak window. Rich Burgundian-style Oregon Chardonnay — great spring white." },
+  { week:60, year:2, date:"May 3, 2027", season:"spring", badge:"red",      vintage:"2019", name:"Dion Vineyard Pinot Noir Winemakers Reserve",     appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2023–2027", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Second of two 2019 WRs. Compare with Week 55 — has it held? Last chance for this label." },
+  { week:61, year:2, date:"May 10, 2027", season:"spring", badge:"white",    vintage:"2021", name:"Domaine Drouhin Oregon Chardonnay Arthur",        appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2022–2028", score:"CT91.9", urgent:true,  special:false, evolution:false, occasion:null,                  note:"End of window in 2028 — open while still at peak. CT91.9. Pair with roasted chicken." },
+  { week:62, year:2, date:"May 17, 2027", season:"spring", badge:"white",    vintage:"2019", name:"Domaine Drouhin Oregon Chardonnay Arthur",        appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2022–2027", score:"CT91.7", urgent:true,  special:false, evolution:false, occasion:null,                  note:"Past its window — open for comparison with the 2021 Arthur from Week 61. Retrospective tasting." },
+  // SUMMER 2027
+  { week:63, year:2, date:"May 24, 2027",  season:"summer", badge:"sparkling",vintage:"2018", name:"Dion Vineyard Marie Grace",                       appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:null,             score:null,      urgent:false, special:true,  evolution:false, occasion:"Summer opener",        note:"9-year-old Oregon méthode traditionnelle sparkling. Should be richly toasty — open with oysters." },
+  { week:64, year:2, date:"May 31, 2027", season:"summer", badge:"white",    vintage:"2023", name:"Adamant Cellars Albariño Philips Vineyard", appellation:"USA · Washington · Walla Walla Valley",         window:"2024–2027", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Last year of window. Second of two — crisp summer sipper. Pair with ceviche or light seafood." },
+  { week:65, year:2, date:"Jun 7, 2027", season:"summer", badge:"rose",     vintage:"2016", name:"Dion Vineyard Lost and Found Rosé",           appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:null,             score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Third and final Lost and Found Rosé. Compare with Week 56 — how has it evolved?" },
+  { week:66, year:2, date:"Jun 14, 2027", season:"summer", badge:"white",    vintage:"2020", name:"Domaine Drouhin Oregon Chardonnay Arthur",        appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2022–2027", score:"CT91.5", urgent:true,  special:false, evolution:false, occasion:null,                  note:"Last year of window. Pair with grilled fish or a summer butter sauce pasta." },
+  { week:67, year:2, date:"Jun 21, 2027",  season:"summer", badge:"white",    vintage:"2023", name:"Dion Vineyard Chardonnay Estate",                 appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2026–2030", score:null,      urgent:false, special:false, evolution:false, occasion:"4th of July weekend",  note:"In its window now. Elegant, cool-climate Oregon Chardonnay. Lovely summer white." },
+  { week:68, year:2, date:"Jun 28, 2027", season:"summer", badge:"red",      vintage:"2021", name:"Dion Vineyard Pinot Noir",                        appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2024–2028", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. First of two 2021 Dion PNs. Lighter-bodied for summer — good with salmon." },
+  { week:69, year:2, date:"Jul 5, 2027", season:"summer", badge:"red",      vintage:"2020", name:"Dion Vineyard Pinot Noir",                        appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2023–2027", score:null,      urgent:true,  special:false, evolution:false, occasion:null,                  note:"Second of two 2020 Dion PNs. Last year of window — compare with the 2021 from Week 68." },
+  { week:70, year:2, date:"Jul 12, 2027", season:"summer", badge:"red",      vintage:"2019", name:"Adamant Cellars Tempranillo Philips Vineyard",    appellation:"USA · Washington · Walla Walla Valley",           window:"2022–2029", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"In its window. Washington Tempranillo — great slightly chilled on a warm evening." },
+  { week:71, year:2, date:"Jul 19, 2027",  season:"summer", badge:"red",      vintage:"2021", name:"LAVINEA Pinot Noir Eola-Amity Hills",             appellation:"Oregon · Willamette Valley · Eola-Amity Hills",   window:"2024–2030", score:"CT90",    urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. First of two LAVINEAs — elegant, mineral-driven Eola Pinot." },
+  { week:72, year:2, date:"Jul 26, 2027",  season:"summer", badge:"red",      vintage:"2021", name:"Dion Vineyard Pinot Noir",                        appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2024–2028", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Second of two 2021 Dion PNs. Compare with Week 68 — opened a month apart." },
+  { week:73, year:2, date:"Aug 2, 2027", season:"summer", badge:"white",    vintage:"2024", name:"Domaine Drouhin Oregon Chardonnay Arthur",        appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2025–2045", score:"CT91",    urgent:false, special:false, evolution:false, occasion:null,                  note:"First of three 2024 Arthurs — opening one early to benchmark the young vintage." },
+  { week:74, year:2, date:"Aug 9, 2027", season:"summer", badge:"red",      vintage:"2020", name:"Adamant Cellars Tempranillo Philips Vineyard",    appellation:"USA · Washington · Walla Walla Valley",           window:"2023–2030", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Peak window. Second Adamant Tempranillo — compare with the 2019 from Week 70." },
+  { week:75, year:2, date:"Aug 16, 2027", season:"summer", badge:"red",      vintage:"2021", name:"LAVINEA Pinot Noir Eola-Amity Hills",             appellation:"Oregon · Willamette Valley · Eola-Amity Hills",   window:"2024–2030", score:"CT90",    urgent:false, special:false, evolution:false, occasion:null,                  note:"Second of two LAVINEAs. End of summer — compare with Week 71." },
+  // FALL 2027
+  { week:76, year:2, date:"Aug 23, 2027",  season:"fall", badge:"red",        vintage:"2022", name:"Cantina Zaccagnini Montepulciano d'Abruzzo",      appellation:"Italy · Abruzzi",                                     window:"2025–2028", score:"CT87.7", urgent:true,  special:false, evolution:false, occasion:"Fall opener",          note:"Approaching end of window. Rustic Italian red — ideal with hearty autumn pasta." },
+  { week:77, year:2, date:"Aug 30, 2027", season:"fall", badge:"red",        vintage:"2021", name:"Dion Vineyard Pinot Noir OG Original Vineyard",   appellation:"Oregon · Willamette Valley · Laurelwood District", window:null,            score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"No window listed — Laurelwood District Pinot should be drinking well at 6 years. First of two OGs." },
+  { week:78, year:2, date:"Sep 6, 2027", season:"fall", badge:"red",        vintage:"2019", name:"Résonance Pinot Noir Choix du Coeur Découverte Vineyard", appellation:"Oregon · Willamette Valley · Dundee Hills", window:"2025–2032", score:"CT91.8", urgent:false, special:true, evolution:false, occasion:null,                 note:"Peak window. Single bottle — CT91.8. Burgundian producer's flagship Oregon Pinot. Decant an hour." },
+  { week:79, year:2, date:"Sep 13, 2027", season:"fall", badge:"red",        vintage:"2021", name:"Jachter Pinot Noir Case Vineyard",                appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2026–2031", score:"CT90.5", urgent:false, special:false, evolution:false, occasion:null,                  note:"Entering peak window. First of two Jachters — lesser-known label worth exploring." },
+  { week:80, year:2, date:"Sep 20, 2027",  season:"fall", badge:"red",        vintage:"2021", name:"Adamant Cellars Nalin",                           appellation:"USA · Washington · Walla Walla Valley",           window:"2026–2030", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Entering window. First of five Nalins — red Bordeaux blend, brooding and structured." },
+  { week:81, year:2, date:"Sep 27, 2027", season:"fall", badge:"red",        vintage:"2021", name:"Adamant Cellars Merlot Winemaker's Select",        appellation:"USA · Washington · Walla Walla Valley",          window:"2026–2031", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Entering window. First of three Merlots — Walla Walla Merlot is plush and textured." },
+  { week:82, year:2, date:"Oct 4, 2027", season:"fall", badge:"red",        vintage:"2022", name:"Dion Vineyard Pinot Noir OG Original Vineyard",   appellation:"Oregon · Willamette Valley · Laurelwood District", window:null,            score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Second OG — compare 2021 vs 2022 back-to-back across Weeks 77 and 82. Great vertical." },
+  { week:83, year:2, date:"Oct 11, 2027", season:"fall", badge:"red",        vintage:"2020", name:"Adamant Cellars Cabernet Franc",                  appellation:"USA · Washington · Columbia Valley",              window:"2024–2030", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Second of two Cab Francs (Year 1 opened the first). Floral, herbaceous — good with roasted duck." },
+  { week:84, year:2, date:"Oct 18, 2027",  season:"fall", badge:"red",        vintage:"2019", name:"Domaine Drouhin Oregon Pinot Noir Laurène",   appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2024–2033", score:"CT92.4", urgent:false, special:true,  evolution:true,  occasion:"Evolution — Laurène Year 2", note:"Annual Laurène — open 2019 (CT92.4). Compare with 2018 from Year 1 Week 36. Is it more or less open?" },
+  { week:85, year:2, date:"Oct 25, 2027",  season:"fall", badge:"red",        vintage:"2019", name:"Adamant Cellars Syrah Artisan",                   appellation:"USA · Washington · Walla Walla Valley",           window:"2023–2028", score:"CT92",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"Second of two 2019 Artisan Syrahs. Last year of window — compare with Week 35. How has it evolved?" },
+  { week:86, year:2, date:"Nov 1, 2027", season:"fall", badge:"red",        vintage:"2021", name:"Jachter Pinot Noir Case Vineyard",                appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2026–2031", score:"CT90.5", urgent:false, special:false, evolution:false, occasion:null,                  note:"Second of two Jachters. Compare with Week 79 — how has it evolved over six weeks?" },
+  { week:87, year:2, date:"Nov 8, 2027", season:"fall", badge:"red",        vintage:"2021", name:"Adamant Cellars Cabernet Sauvignon Don't Be a Dull Boy", appellation:"USA · Washington · Walla Walla Valley", window:"2026–2032", score:null,      urgent:false, special:true,  evolution:false, occasion:"Thanksgiving week",    note:"Entering window. First of four 2021 Cabs — compare to the CT93 2018 opened in Year 1 Week 43." },
+  { week:88, year:2, date:"Nov 15, 2027", season:"fall", badge:"red",        vintage:"2018", name:"Domaine Drouhin Oregon Pinot Noir Laurène",   appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2022–2031", score:"CT92.1", urgent:false, special:true,  evolution:false, occasion:null,                  note:"Second of seven 2018 Laurènes. With 2018 and 2019 now open, how is the 2018 evolving?" },
+  // WINTER 2027-28
+  { week:89, year:2, date:"Nov 22, 2027",  season:"winter", badge:"red",      vintage:"2018", name:"Dion Vineyard Pinot Noir Old Vines",               appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2022–2029", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"First of two 2018 Old Vines. 4 bottles in cellar — benchmarking the older vintage." },
+  { week:90, year:2, date:"Nov 29, 2027", season:"winter", badge:"red",      vintage:"2021", name:"Adamant Cellars Nalin",                           appellation:"USA · Washington · Walla Walla Valley",           window:"2026–2030", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Third of five Nalins. Track how it's evolving across the year." },
+  { week:91, year:2, date:"Dec 6, 2027", season:"winter", badge:"red",      vintage:"2017", name:"Domaine Drouhin Oregon Pinot Noir Louise",        appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2025–2032", score:"CT93.7", urgent:false, special:true,  evolution:true,  occasion:"Holiday dinner — Louise Year 2", note:"Annual Louise — open 2017 (CT93.7). Compare with 2019 from Year 1 Week 40. Peak elegance." },
+  { week:92, year:2, date:"Dec 13, 2027", season:"winter", badge:"sparkling",vintage:"2020", name:"Dion Vineyard Marie Grace",                       appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:null,             score:null,      urgent:false, special:true,  evolution:false, occasion:"New Year's Eve 2027",  note:"Second Marie Grace NYE — 2020 vintage this time. 7-year-old sparkling. Compare with the 2019 from Year 1." },
+  { week:93, year:2, date:"Dec 20, 2027",  season:"winter", badge:"red",      vintage:"2021", name:"Domaine Drouhin Oregon Pinot Noir Origine 34",    appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2024–2031", score:"CT92.1", urgent:false, special:true,  evolution:false, occasion:null,                  note:"Single bottle, CT92.1. New Year opener — Origine series punches well above its entry-level price." },
+  { week:94, year:2, date:"Dec 27, 2027",  season:"winter", badge:"red",      vintage:"2020", name:"Adamant Cellars Cabernet Sauvignon Don't Be a Dull Boy", appellation:"USA · Washington · Walla Walla Valley", window:"2025–2031", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Single bottle — bridge vintage between CT93 2018 and the 2021 entering window." },
+  { week:95, year:2, date:"Jan 3, 2028", season:"winter", badge:"red",      vintage:"2021", name:"Adamant Cellars Cabernet Sauvignon Don't Be a Dull Boy", appellation:"USA · Washington · Walla Walla Valley", window:"2026–2032", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Second of four 2021 Cabs. Compare with the 2020 from last week — a nice mini-vertical." },
+  { week:96, year:2, date:"Jan 10, 2028", season:"winter", badge:"red",      vintage:"2022", name:"Domaine Drouhin Oregon Pinot Noir Origine 35",    appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2026–2032", score:"CT90.5", urgent:false, special:false, evolution:false, occasion:null,                  note:"Entering window. First of four Origine 35s — benchmark this vintage in the Origine lineup." },
+  { week:97, year:2, date:"Jan 17, 2028", season:"winter", badge:"red",      vintage:"2018", name:"Dion Vineyard Pinot Noir Old Vines",               appellation:"Oregon · Willamette Valley · Chehalem Mountains", window:"2022–2029", score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Second of two 2018 Old Vines. Compare with Week 89 — opened two months apart." },
+  { week:98, year:2, date:"Jan 24, 2028",  season:"winter", badge:"red",      vintage:"2022", name:"Drouhin Oregon Roserock Pinot Noir",              appellation:"Oregon · Willamette Valley · Eola-Amity Hills",   window:"2024–2031", score:"CT91.3", urgent:false, special:true,  evolution:true,  occasion:"Valentine's week — Roserock Year 2", note:"Annual Roserock — 2022 vintage this year. Compare with the 2023 from Year 1 Week 47. Different vintage, same evolution track." },
+  { week:99, year:2, date:"Jan 31, 2028", season:"winter", badge:"red",      vintage:"2012", name:"Domaine Drouhin Oregon Pinot Noir",               appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2014–2035", score:"CT90.5", urgent:false, special:true,  evolution:false, occasion:null,                  note:"First of two 2012 DDO PNs. 15-year-old flagship DDO — stunning tertiary development. Decant an hour." },
+  { week:100,year:2, date:"Feb 7, 2028", season:"winter", badge:"red",      vintage:"2021", name:"Adamant Cellars Nalin",                           appellation:"USA · Washington · Walla Walla Valley",           window:"2026–2030", score:null,      urgent:false, special:false, evolution:false, occasion:"Week 100 milestone",   note:"Fourth of five Nalins — a milestone week. Two years in. How has the Nalin evolved since Week 80?" },
+  { week:101,year:2, date:"Feb 14, 2028", season:"winter", badge:"red",      vintage:"2012", name:"Domaine Drouhin Oregon Pinot Noir",               appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2014–2035", score:"CT90.5", urgent:false, special:true,  evolution:false, occasion:null,                  note:"Second of two 2012 DDO PNs. Opened two weeks after Week 99 — has it changed with air?" },
+  { week:102,year:2, date:"Feb 21, 2028",  season:"winter", badge:"red",      vintage:"2017", name:"Dion Vineyard Pinot Noir Wedding Tree Cuvée", appellation:"Oregon · Willamette Valley · Laurelwood District", window:null,            score:"CT88",    urgent:true,  special:false, evolution:false, occasion:null,                  note:"Single bottle, 10 years old. CT88 — open now and enjoy whatever complexity remains." },
+  { week:103,year:2, date:"Feb 28, 2028", season:"winter", badge:"red",      vintage:"2023", name:"Dion Vineyard Pinot Noir OG Original Vineyard",   appellation:"Oregon · Willamette Valley · Laurelwood District", window:null,            score:null,      urgent:false, special:false, evolution:false, occasion:null,                  note:"Single bottle — benchmark the 2023 OG. Young, vibrant Laurelwood Pinot." },
+  { week:104,year:2, date:"Mar 6, 2028", season:"winter", badge:"red",      vintage:"2017", name:"Domaine Drouhin Oregon Pinot Noir Laurène",   appellation:"Oregon · Willamette Valley · Dundee Hills",       window:"2033–2075", score:"CT92.4", urgent:false, special:true,  evolution:true,  occasion:"Year 2 finale",        note:"End-of-year special. 2017 Laurène (window 2033–2075) — decades of life ahead. How does it show at 10 years old?" },
+];
+
+const quarterInfo = {
+  spring: { y1: { title:"Spring 2026",      sub:"March – May",          note:"Urgent opens · lighter whites & rosés warming up" },
+            y2: { title:"Spring 2027",       sub:"March – May",          note:"Urgent closes · Arthur Chardonnay tasting" } },
+  summer: { y1: { title:"Summer 2026",      sub:"June – August",        note:"Rosés, whites & a celebratory Champagne" },
+            y2: { title:"Summer 2027",       sub:"June – August",        note:"Sparkling, whites, lighter Pinots & Tempranillo" } },
+  fall:   { y1: { title:"Fall 2026",        sub:"September – November", note:"Transition to reds — Washington, Italian, Oregon" },
+            y2: { title:"Fall 2027",         sub:"September – November", note:"Nalin & Syrah Artisan · Laurène evolution Year 2" } },
+  winter: { y1: { title:"Winter 2026–2027", sub:"December – March",     note:"Big reds, Barolo, Bordeaux & evolution tracks" },
+            y2: { title:"Winter 2027–2028",  sub:"December – March",     note:"Louise & Roserock evolution · Old Vines vertical · Adamant Cabs" } },
+};
+
+const changelog = {
+  date: "March 22, 2026",
+  summary: "Synced with CellarTracker inventory. Fixed over-counts, added urgent bottles, rescheduled to accommodate changes.",
+  changes: [
+    { type: "added",   week: 8,  description: "DDO Pinot Noir Édition Limitée 2017 (CT94.5) — urgent, window closes 2027" },
+    { type: "added",   week: 35, description: "Adamant Cellars Syrah Artisan 2019 (CT92) — first of two, replacing 2020 vintage" },
+    { type: "added",   week: 85, description: "Adamant Cellars Syrah Artisan 2019 (CT92) — second bottle, last year of window" },
+    { type: "added",   week: 89, description: "Dion Vineyard Pinot Noir Old Vines 2018 — first of two from 4-bottle holding" },
+    { type: "added",   week: 97, description: "Dion Vineyard Pinot Noir Old Vines 2018 — second bottle, winter comparison" },
+    { type: "fixed",   week: 92, description: "Marie Grace vintage changed 2019 → 2020 (only 1 bottle of 2019 in inventory)" },
+    { type: "fixed",   week: 98, description: "Roserock vintage changed 2023 → 2022 (only 1 of 2023 in inventory; 2022 serves as evolution Year 2)" },
+    { type: "removed", week: 15, description: "Adamant Cellars Albariño 2019 dropped (no window data, low urgency)" },
+    { type: "removed", week: 85, description: "Adamant Nalin 2021 removed (4 → 3 plan appearances, 5 bottles remain in cellar)" },
+    { type: "removed", week: 89, description: "Adamant Merlot 2021 removed (first of two removals, 3 bottles remain)" },
+    { type: "removed", week: 97, description: "Adamant Merlot 2021 removed (second removal)" },
+  ]
+};
+
+const typeColors = { sparkling:'#29abe0', rose:'#e83e8c', white:'#c49b2a', red:'#8b3a3a' };
+
+// SVG wine icons — each a distinct glass silhouette
+function wineIcon(badge, size) {
+  size = size || 16;
+  var color = typeColors[badge] || '#8b3a3a';
+  if (badge === 'sparkling') {
+    // Champagne flute — tall narrow glass with bubbles
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M10 2h4v2l-1 8h-2L10 4V2z" fill="'+color+'" opacity="0.25"/>' +
+      '<path d="M10 2h4v2l-1 8h-2L10 4V2z" stroke="'+color+'" stroke-width="1.5" fill="none"/>' +
+      '<line x1="12" y1="12" x2="12" y2="19" stroke="'+color+'" stroke-width="1.5"/>' +
+      '<line x1="9" y1="19" x2="15" y2="19" stroke="'+color+'" stroke-width="1.5" stroke-linecap="round"/>' +
+      '<circle cx="11.5" cy="6" r="0.7" fill="'+color+'"/>' +
+      '<circle cx="12.5" cy="8" r="0.7" fill="'+color+'"/>' +
+      '<circle cx="11" cy="9.5" r="0.5" fill="'+color+'"/>' +
+      '</svg>';
+  }
+  if (badge === 'rose') {
+    // Wine glass — half filled
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M7 2h10l-1.5 9a3.5 3.5 0 01-7 0L7 2z" stroke="'+color+'" stroke-width="1.5" fill="none"/>' +
+      '<path d="M8.8 7h6.4l-.7 4a3.5 3.5 0 01-5 0L8.8 7z" fill="'+color+'" opacity="0.3"/>' +
+      '<line x1="12" y1="14" x2="12" y2="19" stroke="'+color+'" stroke-width="1.5"/>' +
+      '<line x1="9" y1="19" x2="15" y2="19" stroke="'+color+'" stroke-width="1.5" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+  if (badge === 'white') {
+    // Wine glass — quarter filled (lighter pour)
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M7 2h10l-1.5 9a3.5 3.5 0 01-7 0L7 2z" stroke="'+color+'" stroke-width="1.5" fill="none"/>' +
+      '<path d="M9.2 8.5h5.6l-.5 2.5a3.5 3.5 0 01-4.6 0L9.2 8.5z" fill="'+color+'" opacity="0.3"/>' +
+      '<line x1="12" y1="14" x2="12" y2="19" stroke="'+color+'" stroke-width="1.5"/>' +
+      '<line x1="9" y1="19" x2="15" y2="19" stroke="'+color+'" stroke-width="1.5" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+  // red — wine glass filled high
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M7 2h10l-1.5 9a3.5 3.5 0 01-7 0L7 2z" stroke="'+color+'" stroke-width="1.5" fill="none"/>' +
+    '<path d="M8 5h8l-1 6a3.5 3.5 0 01-6 0L8 5z" fill="'+color+'" opacity="0.35"/>' +
+    '<line x1="12" y1="14" x2="12" y2="19" stroke="'+color+'" stroke-width="1.5"/>' +
+    '<line x1="9" y1="19" x2="15" y2="19" stroke="'+color+'" stroke-width="1.5" stroke-linecap="round"/>' +
+    '</svg>';
+}
+
+// Pairing suggestions — injected by inject_pairings.py during pipeline run
+const pairingSuggestions = [{"date": "2026-03-17", "meal": "Slow-Cooker Corned Beef and Cabbage (Irish Boiled Dinner), Apple Pie", "keywords": ["beef", "corned beef"], "planned_wine": "Dion Vineyard Pinot Noir", "planned_vintage": "2007", "planned_badge": "red", "pairing": {"score": "poor", "details": "wine doesn't match: bold red, bold red or riesling would pair better", "suggested_styles": ["bold red or riesling", "bold red"]}, "suggested_bottle": {"vintage": 2020, "wine": "Campo Viejo Tempranillo Rioja Rosado", "varietal": "Tempranillo", "type": "Ros\u00e9", "window": "2022\u20132025", "score": 83.0, "quantity": 1, "urgency": "past peak \u2014 drink now", "move_from_week": 9}}, {"date": "2026-03-18", "meal": "Reuben-style shepherd's pie Week in a day", "keywords": ["shepherd"], "planned_wine": "Dion Vineyard Pinot Noir", "planned_vintage": "2007", "planned_badge": "red", "pairing": {"score": "good", "details": "wine matches the menu well"}}, {"date": "2026-03-19", "meal": "Sunday Pinto Beans", "keywords": ["beans"], "planned_wine": "Dion Vineyard Pinot Noir", "planned_vintage": "2007", "planned_badge": "red", "pairing": {"score": "good", "details": "wine matches the menu well"}}, {"date": "2026-03-20", "meal": "Poblano Mac n cheese from week in a day", "keywords": ["mac"], "planned_wine": "Dion Vineyard Pinot Noir", "planned_vintage": "2007", "planned_badge": "red", "pairing": {"score": "good", "details": "wine matches the menu well"}}, {"date": "2026-03-22", "meal": "Mexican Rotisserie Chicken\nSunday beans (leftover)\n, Feta Lime Coleslaw", "keywords": ["beans", "chicken", "mexican"], "planned_wine": "Dion Vineyard Pinot Noir", "planned_vintage": "2007", "planned_badge": "red", "pairing": {"score": "partial", "details": "matches some (2) but not all (1) food elements", "suggested_styles": ["red or ros\u00e9"]}, "suggested_bottle": {"vintage": 2012, "wine": "Domaine Drouhin Oregon Pinot Noir", "varietal": "Pinot Noir", "type": "Red", "window": "2016\u20132023", "score": 90.5244755244755, "quantity": 2, "urgency": "past peak \u2014 drink now", "move_from_week": 101}}, {"date": "2026-03-23", "meal": "30 Minute Steam Oven Tandoori Roast Chicken", "keywords": ["chicken"], "planned_wine": "Stangeland Gew\u00fcrztraminer", "planned_vintage": "2005", "planned_badge": "white", "pairing": {"score": "poor", "details": "wine doesn't match: medium red or white would pair better", "suggested_styles": ["medium red or white"]}, "suggested_bottle": {"vintage": 2014, "wine": "Dion Vineyard Pinot Noir Winemakers Reserve", "varietal": "Pinot Noir", "type": "Red", "window": "2018\u20132022", "score": 90.5, "quantity": 1, "urgency": "past peak \u2014 drink now", "move_from_week": 5}}, {"date": "2026-03-24", "meal": "Lemony Pasta with Asparagus", "keywords": ["pasta"], "planned_wine": "Stangeland Gew\u00fcrztraminer", "planned_vintage": "2005", "planned_badge": "white", "pairing": {"score": "poor", "details": "wine doesn't match: Italian red would pair better", "suggested_styles": ["Italian red"]}, "suggested_bottle": {"vintage": 2010, "wine": "Dion Vineyard Pinot Noir Winemakers Reserve", "varietal": "Pinot Noir", "type": "Red", "window": "2014\u20132018", "score": 90.3333333333333, "quantity": 1, "urgency": "past peak \u2014 drink now", "move_from_week": 4}}, {"date": "2026-03-25", "meal": "Cast Iron Pan Pizza", "keywords": ["pizza"], "planned_wine": "Stangeland Gew\u00fcrztraminer", "planned_vintage": "2005", "planned_badge": "white", "pairing": {"score": "poor", "details": "wine doesn't match: Italian red or light red would pair better", "suggested_styles": ["Italian red or light red"]}, "suggested_bottle": {"vintage": 2015, "wine": "Dion Vineyard Pinot Noir Winemakers Reserve", "varietal": "Pinot Noir", "type": "Red", "window": "2019\u20132023", "score": 90.0, "quantity": 2, "urgency": "past peak \u2014 drink now", "move_from_week": 48}}, {"date": "2026-03-26", "meal": "Sesame Chicken Schnitzel Bowls with Feta Tzatziki.", "keywords": ["chicken"], "planned_wine": "Stangeland Gew\u00fcrztraminer", "planned_vintage": "2005", "planned_badge": "white", "pairing": {"score": "poor", "details": "wine doesn't match: medium red or white would pair better", "suggested_styles": ["medium red or white"]}, "suggested_bottle": {"vintage": 2008, "wine": "Domaine Thibert P\u00e8re et Fils Pouilly-Fuiss\u00e9 Vignes Blanches", "varietal": "Chardonnay", "type": "White", "window": "2012\u20132015", "score": 90.0, "quantity": 1, "urgency": "past peak \u2014 drink now"}}]; // PAIRING_PLACEHOLDER
+
+function getPairingsForWeek(dateStr) {
+  // dateStr is like "Mar 16, 2026" — find all menu items within this week (0-6 days after)
+  var weekStart = new Date(dateStr);
+  var weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  var results = [];
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  for (var i = 0; i < pairingSuggestions.length; i++) {
+    var s = pairingSuggestions[i];
+    if (!s.pairing && !s.status) continue;
+    if (s.status === 'no_plan_week') continue;
+    var sd = new Date(s.date + 'T12:00:00');
+    if (sd >= weekStart && sd <= weekEnd) {
+      var dayName = days[sd.getDay()];
+      results.push({ suggestion: s, dayName: dayName });
+    }
+  }
+  return results;
+}
+
+function renderPairingsHtml(pairings) {
+  if (!pairings || !pairings.length) return '';
+  var html = '';
+  for (var i = 0; i < pairings.length; i++) {
+    var p = pairings[i];
+    var s = p.suggestion;
+    if (!s.pairing) continue;
+    var score = s.pairing.score;
+    var cls, icon, detail = '';
+    var sb = s.suggested_bottle;
+    if (sb) {
+      cls = 'sommelier';
+      var sbBadge = (sb.type || '').toLowerCase().replace('rosé','rose');
+      if (sb.varietal && sb.varietal.toLowerCase().indexOf('sparkling') >= 0) sbBadge = 'sparkling';
+      icon = wineIcon(sbBadge || 'red', 18);
+      detail = 'The Sommelier suggests: ' + sb.vintage + ' ' + sb.wine;
+    } else if (score === 'good') {
+      cls = 'good'; icon = wineIcon(s.planned_badge || 'red', 18); detail = 'planned wine pairs well';
+    } else {
+      cls = 'partial'; icon = '—'; detail = 'enjoy the planned wine';
+    }
+    html += '<div class="pairing-row ' + cls + '">' +
+      '<span class="pairing-icon">' + icon + '</span>' +
+      '<div><span class="pairing-meal">' + p.dayName + ': ' + s.meal + '</span>' +
+      (detail ? '<div class="pairing-detail">' + detail + '</div>' : '') +
+      '</div></div>';
+  }
+  return html;
+}
+
+function renderCalendar() {
+  const cal = document.getElementById('calendar-view');
+  cal.innerHTML = '';
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const byYear = {};
+  allWeeks.forEach(function(w) {
+    const d = new Date(w.date);
+    const yr = d.getFullYear();
+    const mo = d.getMonth();
+    if (!byYear[yr]) byYear[yr] = {};
+    if (!byYear[yr][mo]) byYear[yr][mo] = [];
+    byYear[yr][mo].push(w);
+  });
+  Object.keys(byYear).sort().forEach(function(yr) {
+    const yearBlock = document.createElement('div');
+    const yh = document.createElement('div');
+    yh.className = 'cal-year-header';
+    const subText = yr == 2026 ? 'Year 1 begins' : yr == 2027 ? 'Year 1 ends · Year 2 begins' : 'Year 2 ends';
+    yh.innerHTML = yr + ' <span class="cal-year-sub">' + subText + '</span>';
+    yearBlock.appendChild(yh);
+    const grid = document.createElement('div');
+    grid.className = 'cal-grid';
+    Object.keys(byYear[yr]).map(Number).sort(function(a,b){return a-b;}).forEach(function(mo) {
+      const entries = byYear[yr][mo];
+      const monthCard = document.createElement('div');
+      monthCard.className = 'cal-month';
+      const hdr = document.createElement('div');
+      hdr.className = 'cal-month-header';
+      hdr.innerHTML = '<span class="cal-month-name">' + monthNames[mo] + '</span><span class="cal-month-count">' + entries.length + ' bottle' + (entries.length > 1 ? 's' : '') + '</span>';
+      monthCard.appendChild(hdr);
+      const entriesDiv = document.createElement('div');
+      entriesDiv.className = 'cal-entries';
+      entries.forEach(function(w) {
+        const pillClass = w.evolution ? 'evolution-pill' : w.urgent ? 'urgent-pill' : w.special ? 'special-pill' : '';
+        const typeColor = typeColors[w.badge] || '#8b2035';
+        const label = w.badge === 'rose' ? 'Rosé' : w.badge.charAt(0).toUpperCase() + w.badge.slice(1);
+        const dayStr = w.date.split(',')[0];
+        const flags = [];
+        if (w.urgent)    flags.push('<span class="cal-flag urgent">⚠ Urgent</span>');
+        if (w.evolution) flags.push('<span class="cal-flag evolution">◉ Evolution</span>');
+        if (w.occasion)  flags.push('<span class="cal-flag occasion">◆ ' + w.occasion + '</span>');
+        else if (w.special && !w.evolution) flags.push('<span class="cal-flag special">◆ Special</span>');
+        const entry = document.createElement('div');
+        entry.className = 'cal-entry';
+        entry.innerHTML = '<div class="cal-week-pill ' + pillClass + '">' + w.week + '</div>' +
+          '<div class="cal-type-dot">' + wineIcon(w.badge, 14) + '</div>' +
+          '<div class="cal-entry-body">' +
+            '<div class="cal-entry-date">' + dayStr + ' &nbsp;·&nbsp; ' + label + '</div>' +
+            '<div class="cal-entry-name"><span class="cal-entry-vintage">' + w.vintage + '</span> ' + w.name + '</div>' +
+            '<div class="cal-entry-sub">' + w.appellation.split(' · ')[0] + '</div>' +
+            (flags.length ? '<div class="cal-entry-flags">' + flags.join('') + '</div>' : '') +
+          '</div>';
+        var calPairings = getPairingsForWeek(w.date);
+        calPairings.forEach(function(cp) {
+          var pScore = cp.suggestion.pairing.score;
+          var pColor = pScore === 'good' ? '#3b4f1e' : pScore === 'partial' ? '#623218' : '#572120';
+          var pIcon = pScore === 'good' ? '✓' : pScore === 'partial' ? '~' : '✗';
+          var mealSpan = document.createElement('div');
+          mealSpan.className = 'cal-entry-sub';
+          mealSpan.style.color = pColor;
+          mealSpan.style.fontWeight = '600';
+          var mealText = pIcon + ' ' + cp.dayName + ': ' + cp.suggestion.meal;
+          if (cp.suggestion.suggested_bottle) {
+            mealText += ' · Sommelier: ' + cp.suggestion.suggested_bottle.vintage + ' ' + cp.suggestion.suggested_bottle.wine;
+          }
+          mealSpan.textContent = mealText;
+          entry.querySelector('.cal-entry-body').appendChild(mealSpan);
+        });
+        entriesDiv.appendChild(entry);
+      });
+      monthCard.appendChild(entriesDiv);
+      grid.appendChild(monthCard);
+    });
+    yearBlock.appendChild(grid);
+    cal.appendChild(yearBlock);
+  });
+}
+
+function renderChangelog() {
+  const view = document.getElementById('changelog-view');
+  view.innerHTML = '';
+  const hc = document.createElement('div');
+  hc.className = 'changelog-header-card';
+  hc.innerHTML = '<div class="changelog-date">Sync date: ' + changelog.date + '</div><h2>What Changed</h2><p class="changelog-summary">' + changelog.summary + '</p>';
+  view.appendChild(hc);
+  [
+    { type:'added',   label:'Added to Plan' },
+    { type:'fixed',   label:'Adjusted' },
+    { type:'removed', label:'Removed from Plan' }
+  ].forEach(function(sec) {
+    const items = changelog.changes.filter(function(c){ return c.type === sec.type; });
+    if (!items.length) return;
+    const s = document.createElement('div');
+    s.className = 'changelog-section';
+    const t = document.createElement('div');
+    t.className = 'changelog-section-title';
+    t.textContent = sec.label + ' (' + items.length + ')';
+    s.appendChild(t);
+    const id = document.createElement('div');
+    id.className = 'changelog-items';
+    items.forEach(function(change) {
+      const typeLabel = change.type === 'added' ? 'Added' : change.type === 'fixed' ? 'Adjusted' : 'Removed';
+      const item = document.createElement('div');
+      item.className = 'changelog-item ' + change.type;
+      item.innerHTML = '<span class="changelog-week-pill">Wk ' + change.week + '</span>' +
+        '<span class="changelog-type-badge">' + typeLabel + '</span>' +
+        '<span class="changelog-description">' + change.description + '</span>';
+      id.appendChild(item);
+    });
+    s.appendChild(id);
+    view.appendChild(s);
+  });
+}
+
+let currentYear = 'y1';
+let currentFilter = 'all';
+
+function getWeeks() {
+  let w = allWeeks;
+  if (currentYear === 'y1') w = w.filter(function(x){ return x.year === 1; });
+  else if (currentYear === 'y2') w = w.filter(function(x){ return x.year === 2; });
+  if (currentFilter === 'urgent')    w = w.filter(function(x){ return x.urgent; });
+  if (currentFilter === 'special')   w = w.filter(function(x){ return x.special; });
+  if (currentFilter === 'evolution') w = w.filter(function(x){ return x.evolution; });
+  if (['spring','summer','fall','winter'].indexOf(currentFilter) >= 0) w = w.filter(function(x){ return x.season === currentFilter; });
+  return w;
+}
+
+function renderPlan() {
+  const plan = document.getElementById('plan');
+  plan.innerHTML = '';
+  const filtered = getWeeks();
+  const seasons = ['spring','summer','fall','winter'];
+  const years = currentYear === 'all' ? [1,2] : currentYear === 'y1' ? [1] : [2];
+  years.forEach(function(yr) {
+    const yrKey = yr === 1 ? 'y1' : 'y2';
+    seasons.forEach(function(season) {
+      const sw = filtered.filter(function(w){ return w.year === yr && w.season === season; });
+      if (!sw.length) return;
+      const info = quarterInfo[season][yrKey];
+      const section = document.createElement('section');
+      section.className = 'quarter';
+      section.innerHTML = '<div class="quarter-header">' +
+        '<h2 class="quarter-title">' + info.title + '</h2>' +
+        '<span class="quarter-sub">' + info.sub + '</span>' +
+        '<span class="quarter-note">' + info.note + '</span>' +
+        '</div><div class="weeks-grid" id="grid-' + yr + '-' + season + '"></div>';
+      plan.appendChild(section);
+      const grid = section.querySelector('#grid-' + yr + '-' + season);
+      sw.forEach(function(w) {
+        const cls = w.evolution ? 'evolution-card' : w.urgent ? 'urgent' : (w.special ? 'special' : '');
+        const card = document.createElement('div');
+        card.className = 'week-card' + (cls ? ' ' + cls : '');
+        const label = w.badge === 'rose' ? 'Rosé' : w.badge.charAt(0).toUpperCase() + w.badge.slice(1);
+        let html = '<div class="card-top"><span class="week-num">Week ' + w.week + '</span><span class="week-date">' + w.date + '</span></div>';
+        html += '<div class="badge badge-' + w.badge + '">' + wineIcon(w.badge, 14) + label + '</div>';
+        html += '<div class="wine-name"><span class="wine-vintage">' + w.vintage + '</span> ' + w.name + '</div>';
+        html += '<div class="wine-appellation">' + w.appellation + '</div>';
+        if (w.window || w.score) {
+          html += '<div class="wine-meta">';
+          if (w.window) html += '<div class="meta-item">Window <span>' + w.window + '</span></div>';
+          if (w.score)  html += '<div class="meta-item">Score <span>' + w.score + '</span></div>';
+          html += '</div>';
+        }
+        if (w.occasion)  html += '<div class="occasion-tag">' + w.occasion + '</div>';
+        if (w.urgent)    html += '<div class="urgent-flag">Drink now — urgent</div>';
+        if (w.evolution) html += '<div class="evolution-flag">Evolution track</div>';
+        html += '<div class="note-text">' + w.note + '</div>';
+        var pairings = getPairingsForWeek(w.date);
+        html += renderPairingsHtml(pairings);
+        card.innerHTML = html;
+        grid.appendChild(card);
+      });
+    });
+  });
+  if (!filtered.length) {
+    plan.innerHTML = '<div class="empty-state">No bottles match this filter for the selected year.</div>';
+  }
+}
+
+function switchYear(yr, btn) {
+  currentYear = yr;
+  document.querySelectorAll('.year-tab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  const planView      = document.getElementById('plan-view');
+  const calView       = document.getElementById('calendar-view');
+  const changelogView = document.getElementById('changelog-view');
+  const filterBar     = document.getElementById('filter-bar');
+  const legendBar     = document.getElementById('legend-bar');
+  planView.classList.add('hidden');
+  calView.classList.remove('visible');
+  changelogView.classList.remove('visible');
+  filterBar.classList.add('hidden');
+  legendBar.classList.add('hidden');
+  if (yr === 'cal') {
+    calView.classList.add('visible');
+    renderCalendar();
+  } else if (yr === 'changes') {
+    changelogView.classList.add('visible');
+    renderChangelog();
+  } else {
+    planView.classList.remove('hidden');
+    filterBar.classList.remove('hidden');
+    legendBar.classList.remove('hidden');
+    renderPlan();
+  }
+}
+
+function applyFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderPlan();
+}
+
+// Populate legend wine icons
+document.getElementById('legend-sparkling').innerHTML = wineIcon('sparkling', 14) + ' Sparkling';
+document.getElementById('legend-rose').innerHTML = wineIcon('rose', 14) + ' Ros\u00e9';
+document.getElementById('legend-white').innerHTML = wineIcon('white', 14) + ' White';
+document.getElementById('legend-red').innerHTML = wineIcon('red', 14) + ' Red';
+
+renderPlan();
+</script>
+</body>
+</html>
