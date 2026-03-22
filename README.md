@@ -8,7 +8,22 @@ A personal wine cellar management system that maintains a multi-year drinking pl
 - Pulls your meal plan from Google Calendar
 - Generates wine-food pairing suggestions ("The Sommelier") based on what's in your cellar
 - Prioritizes bottles that need drinking soon (past peak, expiring)
-- Publishes a self-contained HTML wine plan you can open in any browser
+- Validates all wine metadata against CellarTracker (system of record)
+- Publishes a web app you can view in any browser
+
+## Architecture
+
+Data, presentation, and style are cleanly separated:
+
+```
+site/
+  plan.json                  ← Plan data (allWeeks + changelog)
+  pairing_suggestions.json   ← Generated pairings
+  index.html                 ← App shell (JS rendering)
+  style.css                  ← Styles (Sandstone theme)
+```
+
+The pipeline generates JSON data files. The HTML app shell fetches them on load — no data is embedded in the HTML.
 
 ## Quick Start
 
@@ -38,16 +53,21 @@ A personal wine cellar management system that maintains a multi-year drinking pl
 
 ```bash
 bash fetch.sh
-open site/index.html
+# Then serve site/ with any web server, e.g.:
+python3 -m http.server -d site 8080
 ```
 
 ### Docker (Homelab)
 
 ```bash
+# Persistent service (nightly sync at 2 AM + nginx)
 docker compose up --build
+
+# One-shot test run
+docker compose run --rm run-now
 ```
 
-Runs the pipeline at startup and nightly at 2 AM. Serves the plan at `http://localhost:8080`.
+Container name: `wine-planner`. Serves the plan at `http://localhost:8080`.
 
 ## The Sommelier
 
@@ -59,23 +79,9 @@ The pairing engine matches your meal plan keywords (proteins, cuisines, cooking 
 
 Each card on the plan shows:
 - The planned wine for the week
-- Menu items with pairing indicators
-- Specific bottle suggestions from your cellar when a better match exists
+- Menu items with pairing indicators and suggested bottles (with window and score)
 
 See the [Menu Guide](docs/menu-guide.md) for tips on writing calendar entries that produce the best pairing suggestions.
-
-## Project Structure
-
-```
-site/index.html        — Self-contained wine plan (HTML/CSS/JS)
-scripts/               — Pipeline scripts (Python)
-docs/                  — Workflow instructions and menu guide
-pipeline.sh            — Shared pipeline logic
-fetch.sh               — Local entry point
-fetch_docker.sh        — Docker entry point
-Dockerfile             — Container definition
-docker-compose.yml     — Container orchestration
-```
 
 ## Documentation
 

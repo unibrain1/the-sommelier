@@ -2,10 +2,10 @@
 """Validate plan data against CellarTracker inventory.
 
 CellarTracker is the system of record for all wine metadata.
-This script checks that badges, varietals, and other attributes
-in the plan match the inventory data, and fixes mismatches.
+This script checks that badges in plan.json match the inventory
+Type field, and auto-corrects mismatches.
 
-Usage: validate_plan.py <inventory.json> <site/index.html>
+Usage: validate_plan.py <inventory.json> <plan.json>
 """
 
 import json
@@ -46,31 +46,28 @@ def build_inventory_index(inventory: list[dict]) -> dict:
 def find_inventory_match(vintage: str, name: str, index: dict) -> dict | None:
     """Find the best inventory match for a plan entry."""
     norm = normalize_name(name)
-    # Exact match
     if (vintage, norm) in index:
         return index[(vintage, norm)]
-    # Substring match
     for (v, n), wine in index.items():
         if v == vintage and (norm in n or n in norm):
             return wine
     return None
 
 
-def validate_and_fix(inventory_path: str, html_path: str) -> None:
+def validate_and_fix(inventory_path: str, plan_path: str) -> None:
     """Validate plan badges against inventory and fix mismatches."""
     inventory = json.loads(Path(inventory_path).read_text())
-    html = Path(html_path).read_text(encoding="utf-8")
+    plan_data = json.loads(Path(plan_path).read_text())
 
     index = build_inventory_index(inventory)
-
-    # Extract allWeeks entries with their badge values
-    badge_pattern = re.compile(r'vintage:"(\d+)",\s*name:"([^"]+)".*?badge:"([^"]+)"')
+    all_weeks = plan_data.get("allWeeks", [])
+    modified = False
 
     fixes = []
-    for match in badge_pattern.finditer(html):
-        vintage = match.group(1)
-        name = match.group(2)
-        current_badge = match.group(3)
+    for week in all_weeks:
+        vintage = str(week.get("vintage", ""))
+        name = week.get("name", "")
+        current_badge = week.get("badge", "")
 
         inv_wine = find_inventory_match(vintage, name, index)
         if not inv_wine:
@@ -82,32 +79,25 @@ def validate_and_fix(inventory_path: str, html_path: str) -> None:
         if expected_badge != current_badge:
             fixes.append(
                 {
+                    "week": week.get("week"),
                     "wine": f"{vintage} {name}",
                     "ct_type": ct_type,
                     "was": current_badge,
                     "should_be": expected_badge,
                 }
             )
+            week["badge"] = expected_badge
+            modified = True
 
-    if fixes:
-        # Simpler approach: regex replace each fix
-        for fix in fixes:
-            vintage = fix["wine"].split(" ", 1)[0]
-            name = fix["wine"].split(" ", 1)[1]
-            pattern = re.compile(
-                rf'badge:"{re.escape(fix["was"])}",(\s+)vintage:"{re.escape(vintage)}", name:"{re.escape(name)}"'
-            )
-            replacement = (
-                f'badge:"{fix["should_be"]}",\\1vintage:"{vintage}", name:"{name}"'
-            )
-            html = pattern.sub(replacement, html)
-
-        Path(html_path).write_text(html, encoding="utf-8")
-
+    if modified:
+        Path(plan_path).write_text(
+            json.dumps(plan_data, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
         print(f"Fixed {len(fixes)} badge mismatch(es):")
         for fix in fixes:
             print(
-                f"  {fix['wine']}: {fix['was']} → {fix['should_be']} (CT Type: {fix['ct_type']})"
+                f"  Wk {fix['week']}: {fix['wine']}: "
+                f"{fix['was']} → {fix['should_be']} (CT Type: {fix['ct_type']})"
             )
     else:
         print("All badges match CellarTracker inventory.")
@@ -116,7 +106,7 @@ def validate_and_fix(inventory_path: str, html_path: str) -> None:
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(
-            "Usage: validate_plan.py <inventory.json> <site/index.html>",
+            "Usage: validate_plan.py <inventory.json> <plan.json>",
             file=sys.stderr,
         )
         sys.exit(1)

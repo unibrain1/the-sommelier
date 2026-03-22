@@ -17,11 +17,11 @@ This does everything deterministically (pipeline logic lives in `pipeline.sh`):
 1. Loads `.env` (OP_SERVICE_ACCOUNT_TOKEN, secret references, GOOGLE_CALENDAR_ICS_URL)
 2. Resolves CellarTracker credentials via `op read`
 3. Fetches inventory + menu calendar in parallel → `data/inventory.tsv`, `data/menu.ics`
-4. Parses inventory + plan in parallel → `data/inventory.json`, `data/plan.json`
-5. Parses menu → `data/menu.json` (using keywords from `scripts/wine_keywords.py`)
-6. Compares inventory vs plan → `data/report.json`
-7. Generates food-wine pairing suggestions → `data/pairing_suggestions.json`
-8. Injects pairing data into `site/index.html` at the `PAIRING_PLACEHOLDER` marker
+4. Parses inventory + menu in parallel → `data/inventory.json`, `data/menu.json`
+5. Compares inventory vs `site/plan.json` → `data/report.json`
+6. Generates pairing suggestions → `data/pairing_suggestions.json`
+7. Validates plan badges against CellarTracker Type field (auto-corrects `site/plan.json`)
+8. Copies `pairing_suggestions.json` and `report.json` to `site/`
 
 Do not ask for credentials — they come from 1Password via `.env`. Do not write resolved credentials to any file.
 
@@ -49,7 +49,9 @@ Ask the user to confirm before proceeding to Step 3.
 
 ## Step 3 — Regenerate Plan
 
-When confirmed, rebuild `site/index.html` using the criteria below. Preserve the existing structure, tabs, calendar view, and styling. Only the `allWeeks` data array and stats in the header need to change.
+When confirmed, rebuild `site/plan.json` using the criteria below. **Do not modify `site/index.html`** — it is a presentation shell. Only `site/plan.json` contains plan data.
+
+All wine metadata (badge, varietal, appellation, scores, windows) must come from `data/inventory.json` (CellarTracker is the system of record). The LLM decides scheduling only.
 
 ---
 
@@ -113,10 +115,10 @@ Do not schedule these unless `EndConsume` is within 2 years or explicitly reques
 - Flag with urgent indicator and a note acknowledging the wine may be declining
 - Do not discard from plan — include with honest tasting note expectation
 
-### Output File
+### Output
 
-- Overwrite `site/index.html` in place
-- Preserve all five tabs: Year 1, Year 2, All 104 Weeks, Monthly Calendar, What Changed
-- Update the `changelog` object with changes made in this sync
-- Update the header stats (total bottles, urgent count, evolution count, remaining estimate)
+- Write to `site/plan.json` (not `site/index.html`)
+- Include `allWeeks` array (104 entries), `quarterInfo` object, and `changelog` object
+- Update the `changelog` with changes made in this sync
+- All wine metadata (badge, varietal, appellation, scores, windows) from inventory.json
 - Do not write credentials to any file

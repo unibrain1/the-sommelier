@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Shared pipeline logic — sourced by fetch.sh and fetch_docker.sh
-# Expects: working directory set to project root, .env already loaded
+# Expects: working directory set to project root, env vars already loaded
 
 echo "==> Resolving credentials from 1Password..."
 CT_USERNAME=$(op read "$USERNAME")
@@ -20,28 +20,25 @@ wait $PID_CAL || { echo "ERROR: Calendar fetch failed"; exit 1; }
 LINES=$(wc -l < data/inventory.tsv | tr -d ' ')
 echo "    Downloaded $((LINES - 1)) bottles + menu calendar"
 
-echo "==> Parsing inventory and plan..."
+echo "==> Parsing inventory and menu..."
 python3 scripts/parse_inventory.py data/inventory.tsv > data/inventory.json &
 PID_INV=$!
 
-python3 scripts/parse_plan.py site/index.html > data/plan.json &
-PID_PLAN=$!
+python3 scripts/parse_menu.py data/menu.ics > data/menu.json &
+PID_MENU=$!
 
 wait $PID_INV || { echo "ERROR: Inventory parse failed"; exit 1; }
-wait $PID_PLAN || { echo "ERROR: Plan parse failed"; exit 1; }
-
-echo "==> Parsing menu..."
-python3 scripts/parse_menu.py data/menu.ics > data/menu.json
+wait $PID_MENU || { echo "ERROR: Menu parse failed"; exit 1; }
 
 echo "==> Comparing inventory vs plan..."
-python3 scripts/compare.py data/inventory.json data/plan.json > data/report.json
+python3 scripts/compare.py data/inventory.json site/plan.json > data/report.json
 
 echo "==> Generating pairing suggestions..."
-python3 scripts/pairing.py data/menu.json data/plan.json data/inventory.json > data/pairing_suggestions.json
+python3 scripts/pairing.py data/menu.json site/plan.json data/inventory.json > data/pairing_suggestions.json
 
 echo "==> Validating plan against inventory..."
-python3 scripts/validate_plan.py data/inventory.json site/index.html
+python3 scripts/validate_plan.py data/inventory.json site/plan.json
 
-echo "==> Injecting pairings into site..."
-python3 scripts/inject_pairings.py data/pairing_suggestions.json site/index.html
+echo "==> Publishing to site/..."
+cp data/pairing_suggestions.json site/pairing_suggestions.json
 cp data/report.json site/report.json

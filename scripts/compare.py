@@ -236,7 +236,13 @@ if __name__ == "__main__":
     plan_path = sys.argv[2] if len(sys.argv) > 2 else str(base / "plan.json")
 
     inventory = json.loads(Path(inv_path).read_text())
-    plan = json.loads(Path(plan_path).read_text())
+    plan_data = json.loads(Path(plan_path).read_text())
+    # Support both flat list (legacy) and wrapped {allWeeks: [...]} format
+    plan = (
+        plan_data.get("allWeeks", plan_data)
+        if isinstance(plan_data, dict)
+        else plan_data
+    )
 
     report = compare(inventory, plan)
     json.dump(report, sys.stdout, indent=2, ensure_ascii=False)

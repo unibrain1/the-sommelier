@@ -284,7 +284,12 @@ def main():
         sys.exit(1)
 
     menu = json.loads(Path(sys.argv[1]).read_text())
-    plan = json.loads(Path(sys.argv[2]).read_text())
+    plan_data = json.loads(Path(sys.argv[2]).read_text())
+    plan = (
+        plan_data.get("allWeeks", plan_data)
+        if isinstance(plan_data, dict)
+        else plan_data
+    )
     inventory = json.loads(Path(sys.argv[3]).read_text())
 
     suggestions = suggest_pairings(menu, plan, inventory)
