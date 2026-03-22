@@ -3,9 +3,6 @@ set -euo pipefail
 
 echo "==> Starting wine plan service..."
 
-# Always copy the plan to web root so nginx has something to serve
-cp -r /app/site/* /usr/share/nginx/html/
-
 # Run the pipeline once at startup
 echo "==> Running initial sync..."
 bash /app/fetch_docker.sh || echo "WARNING: Initial sync failed, serving stale plan"
@@ -18,6 +15,6 @@ echo "    Scheduled sync: ${SCHEDULE}"
 # Start cron daemon in background
 service cron start
 
-# Start nginx in foreground
+# Start nginx in foreground (serves directly from /app/site via volume mount)
 echo "==> Starting web server on port 80..."
 nginx -g 'daemon off;'

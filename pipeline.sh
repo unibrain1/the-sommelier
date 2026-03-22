@@ -10,19 +10,28 @@ log "==> Resolving credentials from 1Password..."
 CT_USERNAME=$(op read "$USERNAME") || { log "ERROR: Failed to resolve CellarTracker username from 1Password"; exit 1; }
 CT_PASSWORD=$(op read "$PASSWORD") || { log "ERROR: Failed to resolve CellarTracker password from 1Password"; exit 1; }
 
-log "==> Fetching inventory and menu..."
-curl -sf "https://www.cellartracker.com/xlquery.asp?User=${CT_USERNAME}&Password=${CT_PASSWORD}&Table=Inventory&Format=tab&Location=1" \
-  -o data/inventory.tsv &
+CT_BASE="https://www.cellartracker.com/xlquery.asp?User=${CT_USERNAME}&Password=${CT_PASSWORD}&Format=tab"
+
+log "==> Fetching inventory, notes, food tags, and menu..."
+curl -sf "${CT_BASE}&Table=Inventory&Location=1" -o data/inventory.tsv &
 PID_CT=$!
+
+curl -sf "${CT_BASE}&Table=Notes" -o data/notes.tsv &
+PID_NOTES=$!
+
+curl -sf "${CT_BASE}&Table=FoodTags" -o data/foodtags.tsv &
+PID_FOOD=$!
 
 curl -sf "${GOOGLE_CALENDAR_ICS_URL}" -o data/menu.ics &
 PID_CAL=$!
 
-wait $PID_CT || { log "ERROR: CellarTracker fetch failed — check credentials or network"; exit 1; }
+wait $PID_CT || { log "ERROR: CellarTracker inventory fetch failed"; exit 1; }
+wait $PID_NOTES || { log "WARNING: CellarTracker notes fetch failed — continuing without notes"; }
+wait $PID_FOOD || { log "WARNING: CellarTracker food tags fetch failed — continuing without food tags"; }
 wait $PID_CAL || { log "ERROR: Google Calendar fetch failed — check GOOGLE_CALENDAR_ICS_URL"; exit 1; }
 
 LINES=$(wc -l < data/inventory.tsv | tr -d ' ')
-log "    Downloaded $((LINES - 1)) bottles + menu calendar"
+log "    Downloaded $((LINES - 1)) bottles + notes + food tags + menu calendar"
 
 # --- PARSE (scripted) ---
 log "==> Parsing inventory and menu..."
@@ -39,10 +48,10 @@ wait $PID_MENU || { log "ERROR: Menu parse failed"; exit 1; }
 log "==> Generating plan..."
 python3 scripts/generate_plan.py data/inventory.json site/plan.json || { log "ERROR: Plan generation failed"; exit 1; }
 
-# --- GENERATE NOTES (LLM — Claude Code CLI) ---
+# --- GENERATE NOTES (LLM — Claude Code CLI, augmented with CT notes) ---
 if command -v claude &> /dev/null; then
   log "==> Generating tasting notes (Claude)..."
-  python3 scripts/generate_notes.py site/plan.json || log "WARNING: Note generation failed — plan will have empty notes"
+  python3 scripts/generate_notes.py site/plan.json data/notes.tsv data/foodtags.tsv || log "WARNING: Note generation failed — plan will have empty notes"
 else
   log "    Skipping note generation — claude CLI not available"
 fi

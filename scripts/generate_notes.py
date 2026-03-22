@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Generate tasting notes for plan entries using Claude Code CLI.
 
-Reads plan.json, identifies entries with empty notes, and calls the
-Claude CLI to generate contextual tasting notes for each bottle.
+Reads plan.json and optionally CellarTracker notes/food tags to generate
+contextual tasting notes. Claude augments any existing CT tasting notes
+and food pairing data.
 
 Requires CLAUDE_CODE_OAUTH_TOKEN in the environment.
 
-Usage: generate_notes.py <plan.json>
+Usage: generate_notes.py <plan.json> [notes.tsv] [foodtags.tsv]
 """
 
+import csv
 import json
 import subprocess
 import sys
@@ -17,24 +19,113 @@ from pathlib import Path
 BATCH_SIZE = 20  # bottles per Claude call to stay within context
 
 
-def build_prompt(entries: list[dict]) -> str:
-    """Build a prompt for Claude to generate notes."""
+def parse_ct_notes(notes_path: str) -> dict[str, list[str]]:
+    """Parse CellarTracker tasting notes TSV, indexed by iWine."""
+    notes_by_wine: dict[str, list[str]] = {}
+    path = Path(notes_path)
+    if not path.exists() or path.stat().st_size == 0:
+        return notes_by_wine
+    try:
+        with open(path, encoding="latin-1") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            for row in reader:
+                iwine = row.get("iWine", "")
+                note = row.get("Note", row.get("TastingNote", "")).strip()
+                if iwine and note:
+                    notes_by_wine.setdefault(iwine, []).append(note)
+    except Exception as e:
+        print(f"WARNING: Could not parse notes: {e}", file=sys.stderr)
+    return notes_by_wine
+
+
+def parse_ct_foodtags(foodtags_path: str) -> dict[str, list[str]]:
+    """Parse CellarTracker food tags TSV, indexed by iWine."""
+    tags_by_wine: dict[str, list[str]] = {}
+    path = Path(foodtags_path)
+    if not path.exists() or path.stat().st_size == 0:
+        return tags_by_wine
+    try:
+        with open(path, encoding="latin-1") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            for row in reader:
+                iwine = row.get("iWine", "")
+                tag = row.get("Tag", row.get("FoodTag", "")).strip()
+                if iwine and tag:
+                    tags_by_wine.setdefault(iwine, []).append(tag)
+    except Exception as e:
+        print(f"WARNING: Could not parse food tags: {e}", file=sys.stderr)
+    return tags_by_wine
+
+
+def load_inventory_index(plan_data: dict) -> dict[str, str]:
+    """Build a rough vintage+name → iWine index from plan entries (if available)."""
+    # plan entries don't have iWine, but we can match via inventory.json if present
+    index = {}
+    inv_path = Path("data/inventory.json")
+    if inv_path.exists():
+        try:
+            inventory = json.loads(inv_path.read_text())
+            for wine in inventory:
+                key = f"{wine.get('Vintage', '')}|{wine.get('Wine', '')}".lower()
+                index[key] = str(wine.get("iWine", ""))
+        except Exception:
+            pass
+    return index
+
+
+def find_iwine(vintage: str, name: str, inv_index: dict[str, str]) -> str:
+    """Look up iWine for a plan entry."""
+    key = f"{vintage}|{name}".lower()
+    if key in inv_index:
+        return inv_index[key]
+    # Fuzzy: check if plan name is substring of inventory name or vice versa
+    name_lower = name.lower()
+    for k, iwine in inv_index.items():
+        _, inv_name = k.split("|", 1)
+        if vintage.lower() in k and (name_lower in inv_name or inv_name in name_lower):
+            return iwine
+    return ""
+
+
+def build_prompt(
+    entries: list[dict],
+    ct_notes: dict[str, list[str]],
+    ct_foodtags: dict[str, list[str]],
+    inv_index: dict[str, str],
+) -> str:
+    """Build a prompt for Claude to generate notes, augmented with CT data."""
     lines = []
     for e in entries:
         urgent = "URGENT — past peak or expiring" if e.get("urgent") else ""
         evolution = "EVOLUTION tasting" if e.get("evolution") else ""
         occasion = f"Occasion: {e['occasion']}" if e.get("occasion") else ""
         flags = " | ".join(filter(None, [urgent, evolution, occasion]))
-        lines.append(
+
+        line = (
             f"Week {e['week']}: {e['vintage']} {e['name']} "
             f"({e.get('appellation', '')}) "
             f"Window: {e.get('window', 'unknown')} Score: {e.get('score', 'none')} "
             f"Badge: {e.get('badge', '')} {flags}"
         )
 
+        # Augment with CellarTracker data if available
+        iwine = find_iwine(str(e.get("vintage", "")), e.get("name", ""), inv_index)
+        if iwine:
+            notes = ct_notes.get(iwine, [])
+            if notes:
+                # Include most recent note (first in list)
+                line += f"\n  Your CellarTracker note: {notes[0][:200]}"
+            tags = ct_foodtags.get(iwine, [])
+            if tags:
+                line += f"\n  Food pairings (from CT): {', '.join(tags[:5])}"
+
+        lines.append(line)
+
     bottle_list = "\n".join(lines)
     return f"""Generate a one-sentence tasting note for each wine below. The note should:
 - Be 1-2 sentences max, conversational tone
+- If a CellarTracker note is provided, build on it — don't repeat it verbatim but reference the user's experience
+- If food pairings from CT are provided, incorporate them as suggestions
 - For urgent/past-peak wines: acknowledge the wine may be declining, suggest decanting or having a backup
 - For evolution wines: mention comparing with previous/future vintages
 - For holiday occasions: reference the occasion
@@ -71,7 +162,6 @@ def call_claude(prompt: str) -> str:
 
 def extract_json(text: str) -> dict:
     """Extract JSON object from Claude's response."""
-    # Find the JSON block
     start = text.find("{")
     end = text.rfind("}") + 1
     if start == -1 or end == 0:
@@ -83,10 +173,26 @@ def extract_json(text: str) -> dict:
         return {}
 
 
-def generate_notes(plan_path: str) -> None:
+def generate_notes(
+    plan_path: str,
+    notes_path: str | None = None,
+    foodtags_path: str | None = None,
+) -> None:
     """Generate notes for plan entries with empty notes."""
     plan_data = json.loads(Path(plan_path).read_text())
     all_weeks = plan_data.get("allWeeks", [])
+
+    # Load CellarTracker data if available
+    ct_notes = parse_ct_notes(notes_path) if notes_path else {}
+    ct_foodtags = parse_ct_foodtags(foodtags_path) if foodtags_path else {}
+    inv_index = load_inventory_index(plan_data)
+
+    if ct_notes:
+        print(f"  Loaded {sum(len(v) for v in ct_notes.values())} CellarTracker notes")
+    if ct_foodtags:
+        print(
+            f"  Loaded {sum(len(v) for v in ct_foodtags.values())} CellarTracker food tags"
+        )
 
     # Find entries that need notes
     needs_notes = [w for w in all_weeks if not w.get("note")]
@@ -100,7 +206,7 @@ def generate_notes(plan_path: str) -> None:
     notes_generated = 0
     for i in range(0, len(needs_notes), BATCH_SIZE):
         batch = needs_notes[i : i + BATCH_SIZE]
-        prompt = build_prompt(batch)
+        prompt = build_prompt(batch, ct_notes, ct_foodtags, inv_index)
 
         print(f"  Batch {i // BATCH_SIZE + 1}: {len(batch)} wines...")
         response = call_claude(prompt)
@@ -125,6 +231,13 @@ def generate_notes(plan_path: str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: generate_notes.py <plan.json>", file=sys.stderr)
+        print(
+            "Usage: generate_notes.py <plan.json> [notes.tsv] [foodtags.tsv]",
+            file=sys.stderr,
+        )
         sys.exit(1)
-    generate_notes(sys.argv[1])
+    generate_notes(
+        sys.argv[1],
+        sys.argv[2] if len(sys.argv) > 2 else None,
+        sys.argv[3] if len(sys.argv) > 3 else None,
+    )

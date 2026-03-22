@@ -8,6 +8,8 @@ services:
       - .env
     environment:
       - SYNC_SCHEDULE=0 2 * * *
+    volumes:
+      - ./site:/app/site
     restart: unless-stopped
 
   run-now:
@@ -15,6 +17,8 @@ services:
     container_name: wine-planner-run
     env_file:
       - .env
+    volumes:
+      - ./site:/app/site
     entrypoint: []
     command: ["bash", "/app/fetch_docker.sh"]
     profiles:

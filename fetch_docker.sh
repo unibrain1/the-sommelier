@@ -12,9 +12,6 @@ fi
 
 source pipeline.sh
 
-echo "==> Copying site to web root..."
-cp -r site/* /usr/share/nginx/html/
-
 echo "==> Done."
 jq '.summary' data/report.json
 echo ""
