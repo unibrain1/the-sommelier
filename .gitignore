@@ -8,6 +8,12 @@ data/
 __pycache__/
 *.pyc
 
+# Linter cache
+.ruff_cache/
+
+# Claude Code local config
+.claude/settings.local.json
+
 # MCP / Playwright
 .playwright-mcp/
 
