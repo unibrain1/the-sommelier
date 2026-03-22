@@ -18,7 +18,10 @@ PATTERN = re.compile(r"const pairingSuggestions = .*?; // PAIRING_PLACEHOLDER")
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: inject_pairings.py <pairing_suggestions.json> <site/index.html>", file=sys.stderr)
+        print(
+            "Usage: inject_pairings.py <pairing_suggestions.json> <site/index.html>",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     pairing_path = Path(sys.argv[1])
@@ -29,7 +32,9 @@ def main():
 
     html = html_path.read_text(encoding="utf-8")
 
-    replacement = f"const pairingSuggestions = {json.dumps(suggestions)}; // PAIRING_PLACEHOLDER"
+    replacement = (
+        f"const pairingSuggestions = {json.dumps(suggestions)}; // PAIRING_PLACEHOLDER"
+    )
 
     new_html, count = PATTERN.subn(lambda _: replacement, html)
     if count == 0:

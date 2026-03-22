@@ -8,15 +8,33 @@ Output: inventory.json to stdout — array of unique wines with quantities.
 import csv
 import json
 import sys
-from collections import Counter
 from pathlib import Path
 
 KEEP_FIELDS = [
-    "iWine", "Vintage", "Wine", "Varietal", "MasterVarietal", "Type", "Color",
-    "Category", "Country", "Region", "SubRegion", "Appellation", "Producer",
-    "Designation", "Vineyard", "Location", "Bin", "Size",
-    "BeginConsume", "EndConsume", "CT", "MY",
+    "iWine",
+    "Vintage",
+    "Wine",
+    "Varietal",
+    "MasterVarietal",
+    "Type",
+    "Color",
+    "Category",
+    "Country",
+    "Region",
+    "SubRegion",
+    "Appellation",
+    "Producer",
+    "Designation",
+    "Vineyard",
+    "Location",
+    "Bin",
+    "Size",
+    "BeginConsume",
+    "EndConsume",
+    "CT",
+    "MY",
 ]
+
 
 def int_or_none(val):
     try:
@@ -24,11 +42,13 @@ def int_or_none(val):
     except (ValueError, TypeError):
         return None
 
+
 def float_or_none(val):
     try:
         return float(val)
     except (ValueError, TypeError):
         return None
+
 
 def parse_inventory(tsv_path):
     with open(tsv_path, encoding="latin-1") as f:
@@ -36,7 +56,9 @@ def parse_inventory(tsv_path):
         rows = list(reader)
 
     # Group by (iWine, Vintage) to count bottles
-    key_fn = lambda r: (r.get("iWine", ""), r.get("Vintage", ""))
+    def key_fn(r):
+        return (r.get("iWine", ""), r.get("Vintage", ""))
+
     groups = {}
     for row in rows:
         k = key_fn(row)
@@ -58,8 +80,13 @@ def parse_inventory(tsv_path):
     wines.sort(key=lambda w: (w["EndConsume"] is None, w["EndConsume"] or 9999))
     return wines
 
+
 if __name__ == "__main__":
-    tsv = sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).parent / "inventory.tsv")
+    tsv = (
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else str(Path(__file__).parent / "inventory.tsv")
+    )
     wines = parse_inventory(tsv)
     json.dump(wines, sys.stdout, indent=2, ensure_ascii=False)
     print()  # trailing newline

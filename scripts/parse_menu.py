@@ -68,12 +68,14 @@ def parse_ics(ics_text: str) -> list[dict]:
         combined_text = f"{summary} {description}"
         keywords = extract_keywords(combined_text)
 
-        entries.append({
-            "date": event_date.isoformat(),
-            "meal": summary.strip(),
-            "description": description.strip() if description else "",
-            "keywords": keywords,
-        })
+        entries.append(
+            {
+                "date": event_date.isoformat(),
+                "meal": summary.strip(),
+                "description": description.strip() if description else "",
+                "keywords": keywords,
+            }
+        )
 
     entries.sort(key=lambda e: e["date"])
     return entries

@@ -9,6 +9,7 @@ import re
 import sys
 from pathlib import Path
 
+
 def extract_allweeks_js(html_path):
     """Extract the raw JS array literal from the HTML file."""
     text = Path(html_path).read_text(encoding="utf-8")
@@ -35,6 +36,7 @@ def extract_allweeks_js(html_path):
     raw = text[start : i + 1]
     return raw
 
+
 def js_array_to_json(raw_js):
     """Convert JS object literal syntax to valid JSON."""
     s = raw_js
@@ -50,10 +52,16 @@ def js_array_to_json(raw_js):
 
     # Replace single quotes with double quotes (for string values)
     # Handle JS strings in single quotes, being careful not to break apostrophes in double-quoted strings
-    s = re.sub(r":\s*'([^']*)'", lambda m: ': "' + m.group(1).replace('"', '\\"') + '"', s)
+    s = re.sub(
+        r":\s*'([^']*)'", lambda m: ': "' + m.group(1).replace('"', '\\"') + '"', s
+    )
 
     # Convert JS booleans/null
-    s = s.replace(": true", ": true").replace(": false", ": false").replace(": null", ": null")
+    s = (
+        s.replace(": true", ": true")
+        .replace(": false", ": false")
+        .replace(": null", ": null")
+    )
 
     # Remove trailing commas before } or ]
     s = re.sub(r",\s*([}\]])", r"\1", s)
@@ -63,13 +71,19 @@ def js_array_to_json(raw_js):
 
     return json.loads(s)
 
+
 def parse_plan(html_path):
     raw = extract_allweeks_js(html_path)
     bottles = js_array_to_json(raw)
     return bottles
 
+
 if __name__ == "__main__":
-    html = sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).parent / "site" / "index.html")
+    html = (
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else str(Path(__file__).parent / "site" / "index.html")
+    )
     bottles = parse_plan(html)
     json.dump(bottles, sys.stdout, indent=2, ensure_ascii=False)
     print()

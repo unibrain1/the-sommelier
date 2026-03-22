@@ -32,6 +32,7 @@ ALIASES = {
     "dion": "dion vineyard",
 }
 
+
 def normalize(name):
     """Lowercase, strip punctuation, collapse whitespace."""
     s = name.lower()
@@ -40,6 +41,7 @@ def normalize(name):
     s = re.sub(r"[^a-z0-9\s]", " ", s)
     return re.sub(r"\s+", " ", s).strip()
 
+
 def expand_aliases(name_norm):
     """Expand known abbreviations in a normalized plan name."""
     for abbr, full in sorted(ALIASES.items(), key=lambda x: -len(x[0])):
@@ -47,8 +49,10 @@ def expand_aliases(name_norm):
             name_norm = name_norm.replace(abbr, normalize(full))
     return name_norm
 
+
 def tokenize(name):
     return set(name.split())
+
 
 def match_score(plan_name, inv_name, plan_vintage, inv_vintage):
     """Score how well a plan bottle matches an inventory wine. Higher = better. 0 = no match."""
@@ -67,7 +71,22 @@ def match_score(plan_name, inv_name, plan_vintage, inv_vintage):
     p_tokens = tokenize(pn_expanded)
     i_tokens = tokenize(inv_n)
     # Remove very common words
-    stopwords = {"the", "a", "an", "de", "du", "des", "le", "la", "les", "et", "vineyard", "cellars", "winery", "estate"}
+    stopwords = {
+        "the",
+        "a",
+        "an",
+        "de",
+        "du",
+        "des",
+        "le",
+        "la",
+        "les",
+        "et",
+        "vineyard",
+        "cellars",
+        "winery",
+        "estate",
+    }
     p_tokens -= stopwords
     i_tokens -= stopwords
 
@@ -82,6 +101,7 @@ def match_score(plan_name, inv_name, plan_vintage, inv_vintage):
         score += 10
 
     return score
+
 
 def find_best_match(plan_bottle, inventory):
     """Find the best matching inventory wine for a plan bottle."""
@@ -100,6 +120,7 @@ def find_best_match(plan_bottle, inventory):
             best_score = sc
             best = inv_wine
     return (best, best_score) if best_score >= 40 else (None, 0)
+
 
 def compare(inventory, plan):
     # Track which inventory wines are matched and how many times
@@ -120,12 +141,14 @@ def compare(inventory, plan):
     consumed = []
     for pb, inv_wine, score in plan_matches:
         if inv_wine is None:
-            consumed.append({
-                "plan_name": pb["name"],
-                "plan_vintage": pb.get("vintage"),
-                "plan_date": pb.get("date"),
-                "plan_week": pb.get("week"),
-            })
+            consumed.append(
+                {
+                    "plan_name": pb["name"],
+                    "plan_vintage": pb.get("vintage"),
+                    "plan_date": pb.get("date"),
+                    "plan_week": pb.get("week"),
+                }
+            )
 
     # 2. New urgent: in inventory, not in plan, EndConsume ≤ current_year + 1
     urgent_new = []
@@ -134,17 +157,19 @@ def compare(inventory, plan):
         if key not in matched_inv_keys:
             ec = inv_wine["EndConsume"]
             if ec is not None and ec <= CURRENT_YEAR + 1:
-                urgent_new.append({
-                    "wine": inv_wine["Wine"],
-                    "vintage": inv_wine["Vintage"],
-                    "quantity": inv_wine["Quantity"],
-                    "begin_consume": inv_wine["BeginConsume"],
-                    "end_consume": inv_wine["EndConsume"],
-                    "ct_score": inv_wine["CT"],
-                    "type": inv_wine["Type"],
-                    "varietal": inv_wine["Varietal"],
-                    "region": inv_wine["Region"],
-                })
+                urgent_new.append(
+                    {
+                        "wine": inv_wine["Wine"],
+                        "vintage": inv_wine["Vintage"],
+                        "quantity": inv_wine["Quantity"],
+                        "begin_consume": inv_wine["BeginConsume"],
+                        "end_consume": inv_wine["EndConsume"],
+                        "ct_score": inv_wine["CT"],
+                        "type": inv_wine["Type"],
+                        "varietal": inv_wine["Varietal"],
+                        "region": inv_wine["Region"],
+                    }
+                )
 
     # 3. Quantity mismatches
     mismatches = []
@@ -152,13 +177,15 @@ def compare(inventory, plan):
         for inv_wine in inventory:
             if (inv_wine["iWine"], inv_wine["Vintage"]) == key:
                 if plan_count != inv_wine["Quantity"]:
-                    mismatches.append({
-                        "wine": inv_wine["Wine"],
-                        "vintage": inv_wine["Vintage"],
-                        "inventory_qty": inv_wine["Quantity"],
-                        "plan_qty": plan_count,
-                        "end_consume": inv_wine["EndConsume"],
-                    })
+                    mismatches.append(
+                        {
+                            "wine": inv_wine["Wine"],
+                            "vintage": inv_wine["Vintage"],
+                            "inventory_qty": inv_wine["Quantity"],
+                            "plan_qty": plan_count,
+                            "end_consume": inv_wine["EndConsume"],
+                        }
+                    )
                 break
 
     # 4. Unplanned: in inventory but not in plan at all (excluding urgent already reported)
@@ -169,17 +196,19 @@ def compare(inventory, plan):
         if key not in matched_inv_keys:
             ident = (inv_wine["Wine"], inv_wine["Vintage"])
             if ident not in urgent_keys:
-                unplanned.append({
-                    "wine": inv_wine["Wine"],
-                    "vintage": inv_wine["Vintage"],
-                    "quantity": inv_wine["Quantity"],
-                    "begin_consume": inv_wine["BeginConsume"],
-                    "end_consume": inv_wine["EndConsume"],
-                    "ct_score": inv_wine["CT"],
-                    "type": inv_wine["Type"],
-                    "varietal": inv_wine["Varietal"],
-                    "region": inv_wine["Region"],
-                })
+                unplanned.append(
+                    {
+                        "wine": inv_wine["Wine"],
+                        "vintage": inv_wine["Vintage"],
+                        "quantity": inv_wine["Quantity"],
+                        "begin_consume": inv_wine["BeginConsume"],
+                        "end_consume": inv_wine["EndConsume"],
+                        "ct_score": inv_wine["CT"],
+                        "type": inv_wine["Type"],
+                        "varietal": inv_wine["Varietal"],
+                        "region": inv_wine["Region"],
+                    }
+                )
 
     report = {
         "generated": str(date.today()),
@@ -199,6 +228,7 @@ def compare(inventory, plan):
         "unplanned": unplanned,
     }
     return report
+
 
 if __name__ == "__main__":
     base = Path(__file__).parent

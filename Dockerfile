@@ -1,6 +1,9 @@
+# hadolint global ignore=DL3008
 FROM python:3.12-slim AS base
 
-# Install nginx, curl, jq, and 1Password CLI
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Install nginx, curl, jq, cron, and 1Password CLI
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx curl jq gnupg cron \
     && curl -sS https://downloads.1password.com/linux/keys/1password.asc | \

@@ -45,14 +45,16 @@ def find_week_for_date(week_index: dict[date, dict], target_date: str) -> dict |
 def precompute_searchable(inventory: list[dict]) -> None:
     """Add a pre-lowered searchable string to each inventory wine."""
     for wine in inventory:
-        wine["_searchable"] = " ".join([
-            wine.get("Wine", ""),
-            wine.get("Varietal", ""),
-            wine.get("MasterVarietal", ""),
-            wine.get("Type", ""),
-            wine.get("Region", ""),
-            wine.get("SubRegion", ""),
-        ]).lower()
+        wine["_searchable"] = " ".join(
+            [
+                wine.get("Wine", ""),
+                wine.get("Varietal", ""),
+                wine.get("MasterVarietal", ""),
+                wine.get("Type", ""),
+                wine.get("Region", ""),
+                wine.get("SubRegion", ""),
+            ]
+        ).lower()
 
 
 def wine_matches_styles(wine: dict, prefer_list: list[str]) -> bool:
@@ -78,7 +80,12 @@ def urgency_score(wine: dict) -> int:
     return 5  # long-ager or unknown
 
 
-def find_best_bottle(keywords: list[str], inventory: list[dict], planned_wines: dict[str, str] | None = None, exclude: set[str] | None = None) -> dict | None:
+def find_best_bottle(
+    keywords: list[str],
+    inventory: list[dict],
+    planned_wines: dict[str, str] | None = None,
+    exclude: set[str] | None = None,
+) -> dict | None:
     """Find the best bottle from inventory matching food keywords, using priority rules.
 
     planned_wines maps "vintage wine" keys to the week they're planned for.
@@ -119,10 +126,12 @@ def find_best_bottle(keywords: list[str], inventory: list[dict], planned_wines: 
         return None
 
     # Sort by urgency (most urgent first), then by CT score descending
-    candidates.sort(key=lambda w: (
-        urgency_score(w),
-        -(w.get("CT") or 0),
-    ))
+    candidates.sort(
+        key=lambda w: (
+            urgency_score(w),
+            -(w.get("CT") or 0),
+        )
+    )
 
     best = candidates[0]
     u = urgency_score(best)
@@ -167,7 +176,9 @@ def score_pairing(wine_name: str, keywords: list[str]) -> dict:
         if any(style in wine_lower for style in rule["prefer"]):
             matches.append({"keyword": kw, "category": rule["category"], "match": True})
         else:
-            mismatches.append({"keyword": kw, "category": rule["category"], "match": False})
+            mismatches.append(
+                {"keyword": kw, "category": rule["category"], "match": False}
+            )
 
     if not matches and not mismatches:
         return {"score": "neutral", "details": "no pairing rules matched menu keywords"}
@@ -188,7 +199,9 @@ def score_pairing(wine_name: str, keywords: list[str]) -> dict:
     }
 
 
-def suggest_pairings(menu: list[dict], plan: list[dict], inventory: list[dict]) -> list[dict]:
+def suggest_pairings(
+    menu: list[dict], plan: list[dict], inventory: list[dict]
+) -> list[dict]:
     """Generate pairing suggestions for weeks with menu entries."""
     # Precompute indexes for O(1) lookups
     week_index = build_week_index(plan)
@@ -205,24 +218,31 @@ def suggest_pairings(menu: list[dict], plan: list[dict], inventory: list[dict]) 
     for entry in menu:
         week = find_week_for_date(week_index, entry["date"])
         if not week:
-            suggestions.append({
-                "date": entry["date"],
-                "meal": entry["meal"],
-                "status": "no_plan_week",
-                "note": "no wine plan entry found for this date",
-            })
+            suggestions.append(
+                {
+                    "date": entry["date"],
+                    "meal": entry["meal"],
+                    "status": "no_plan_week",
+                    "note": "no wine plan entry found for this date",
+                }
+            )
             continue
 
         if not entry["keywords"]:
-            suggestions.append({
-                "date": entry["date"],
-                "meal": entry["meal"],
-                "planned_wine": week.get("name", ""),
-                "planned_vintage": week.get("vintage", ""),
-                "planned_badge": week.get("badge", "red"),
-                "status": "no_keywords",
-                "pairing": {"score": "neutral", "details": "no match — enjoy the planned wine"},
-            })
+            suggestions.append(
+                {
+                    "date": entry["date"],
+                    "meal": entry["meal"],
+                    "planned_wine": week.get("name", ""),
+                    "planned_vintage": week.get("vintage", ""),
+                    "planned_badge": week.get("badge", "red"),
+                    "status": "no_keywords",
+                    "pairing": {
+                        "score": "neutral",
+                        "details": "no match — enjoy the planned wine",
+                    },
+                }
+            )
             continue
 
         wine_name = f"{week.get('name', '')} {week.get('appellation', '')}"
@@ -241,7 +261,10 @@ def suggest_pairings(menu: list[dict], plan: list[dict], inventory: list[dict]) 
         # If the planned wine doesn't pair well, suggest a better bottle
         if pairing["score"] in ("poor", "partial"):
             suggestion = find_best_bottle(
-                entry["keywords"], inventory, planned_wines, already_suggested,
+                entry["keywords"],
+                inventory,
+                planned_wines,
+                already_suggested,
             )
             if suggestion:
                 result["suggested_bottle"] = suggestion
@@ -254,7 +277,10 @@ def suggest_pairings(menu: list[dict], plan: list[dict], inventory: list[dict]) 
 
 def main():
     if len(sys.argv) < 4:
-        print("Usage: pairing.py <menu.json> <plan.json> <inventory.json>", file=sys.stderr)
+        print(
+            "Usage: pairing.py <menu.json> <plan.json> <inventory.json>",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     menu = json.loads(Path(sys.argv[1]).read_text())
