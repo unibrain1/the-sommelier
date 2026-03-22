@@ -1,53 +1,51 @@
 # Wine Plan
 
-A personal wine cellar management system that generates a multi-year drinking plan from your [CellarTracker](https://www.cellartracker.com) inventory and pairs wines with your Google Calendar meal plan.
+A personal wine cellar management system that generates a weekly drinking plan from your [CellarTracker](https://www.cellartracker.com) inventory and pairs wines with your meal plan.
 
 ## How It Works
 
 ```
 ┌─────────────────────────────────────────────────────────┐
+│  SELF-UPDATE         git pull                           │
+├─────────────────────────────────────────────────────────┤
 │  FETCH (scripted)                                       │
-│    CellarTracker inventory + Google Calendar menu        │
+│    CellarTracker inventory + notes + food tags           │
+│    Google Calendar menu                                 │
 ├─────────────────────────────────────────────────────────┤
 │  GENERATE PLAN (scripted — rules-based)                 │
-│    52-week plan: priority, season, evolution, holidays  │
+│    52-week plan: priority, season, evolution, holidays   │
 ├─────────────────────────────────────────────────────────┤
 │  GENERATE NOTES (LLM — Claude Code CLI)                 │
-│    Contextual tasting notes for each bottle              │
+│    Contextual tasting notes, augmented with CT data      │
 ├─────────────────────────────────────────────────────────┤
 │  COMPARE & PAIR (scripted)                              │
 │    Inventory diff + food-wine pairing suggestions        │
 ├─────────────────────────────────────────────────────────┤
-│  PUBLISH                                                │
-│    Self-updating web app served via nginx                │
+│  PUBLISH (atomic)                                       │
+│    Complete plan with notes → site/                      │
 └─────────────────────────────────────────────────────────┘
 ```
 
 The plan regenerates from scratch every run. CellarTracker is the system of record for all wine metadata. Claude generates tasting notes. Everything else is deterministic.
+
+Self-updating: push code to GitHub, next pipeline run picks it up automatically.
 
 ## Quick Start
 
 ### Prerequisites
 
 - Python 3.12+
-- [1Password CLI](https://developer.1password.com/docs/cli/) (`op`)
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (`claude`) — for tasting notes
-- A CellarTracker account
-- A Google Calendar with meal plans
+- [1Password CLI](https://developer.1password.com/docs/cli/) (`op`) — or see [Without 1Password](#without-1password)
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (`claude`) — optional, for tasting notes
+- A [CellarTracker](https://www.cellartracker.com) account
+- A Google Calendar with meal plans — see [Menu Plan Setup](#menu-plan-setup)
 
 ### Setup
 
 ```bash
 pip install -r requirements.txt
-```
-
-Create `.env`:
-```
-OP_SERVICE_ACCOUNT_TOKEN=<token>
-USERNAME="op://<vault>/<item>/username"
-PASSWORD="op://<vault>/<item>/password"
-GOOGLE_CALENDAR_ICS_URL=https://calendar.google.com/calendar/ical/.../basic.ics
-CLAUDE_CODE_OAUTH_TOKEN=<token from: claude setup-token>
+cp .env.sample .env
+# Edit .env with your credentials
 ```
 
 ### Run
@@ -61,14 +59,94 @@ python3 -m http.server -d site 8080
 ### Docker (Homelab)
 
 ```bash
-# Persistent service — syncs nightly + serves via nginx
-docker compose up --build
+# First time or Dockerfile changes
+docker compose up --build -d
+
+# Code changes only — no rebuild needed
+docker compose down && docker compose up -d
 
 # One-shot test run
 docker compose run --rm run-now
 ```
 
-Container: `wine-planner` on port `8080`. Schedule configurable via `SYNC_SCHEDULE` env var.
+Container: `wine-planner`. Schedule configurable via `SYNC_SCHEDULE` env var.
+Runs as non-root (configure `user` in docker-compose.yml to match your host UID/GID).
+
+## Menu Plan Setup
+
+The pipeline reads your meal plan from a Google Calendar via its secret .ics URL. You can populate the calendar manually or use a recipe manager like [Paprika](https://www.paprikaapp.com).
+
+### Using Paprika (recommended)
+
+[Paprika](https://www.paprikaapp.com) is a recipe manager that can sync meal plans to Google Calendar.
+
+1. In Paprika, go to **Settings → Calendar → Google Calendar**
+2. Sign in with your Google account and select or create a calendar (e.g., "Menu Plan")
+3. Plan your meals in Paprika's meal planner — they'll sync automatically to the calendar
+
+### Using any calendar
+
+You can also add meal events directly to any Google Calendar. Name each event after the meal (e.g., "Grilled Lamb Chops"). See [Menu Guide](docs/menu-guide.md) for tips on writing entries that produce the best pairing suggestions.
+
+### Getting the calendar .ics URL
+
+1. Open [Google Calendar](https://calendar.google.com) in a browser
+2. Click the **⋮** menu next to your meal plan calendar → **Settings and sharing**
+3. Scroll to **Integrate calendar**
+4. Copy the **Secret address in iCal format** — it looks like:
+   ```
+   https://calendar.google.com/calendar/ical/...%40group.calendar.google.com/private-.../basic.ics
+   ```
+5. Add it to your `.env` as `GOOGLE_CALENDAR_ICS_URL`
+
+## Without 1Password
+
+The default setup uses [1Password CLI](https://developer.1password.com/docs/cli/) to securely resolve CellarTracker credentials at runtime. If you don't use 1Password, you can provide credentials directly:
+
+### Option 1: Plain text in .env (simplest)
+
+Replace the 1Password secret references in `.env` with your actual credentials:
+
+```bash
+# Instead of:
+# USERNAME="op://vault/item/username"
+# PASSWORD="op://vault/item/password"
+
+# Use:
+CT_USERNAME=your_cellartracker_username
+CT_PASSWORD=your_cellartracker_password
+```
+
+Then modify `pipeline.sh` — replace the `op read` lines:
+
+```bash
+# Replace:
+CT_USERNAME=$(op read "$USERNAME")
+CT_PASSWORD=$(op read "$PASSWORD")
+
+# With:
+CT_USERNAME="${CT_USERNAME}"
+CT_PASSWORD="${CT_PASSWORD}"
+```
+
+**Note:** Your credentials will be stored in plain text. Do not commit `.env` to git (it's already in `.gitignore`).
+
+### Option 2: Environment variables
+
+Set credentials as environment variables in your shell or Docker compose:
+
+```yaml
+# docker-compose.yml
+environment:
+  - CT_USERNAME=your_cellartracker_username
+  - CT_PASSWORD=your_cellartracker_password
+```
+
+And make the same `pipeline.sh` change as Option 1.
+
+### Option 3: Other secret managers
+
+Adapt the `op read` lines in `pipeline.sh` to use your preferred secret manager (Vault, AWS Secrets Manager, Bitwarden CLI, etc.).
 
 ## The Sommelier
 
@@ -76,6 +154,6 @@ The pairing engine matches your meal plan against your cellar and suggests wines
 
 ## Documentation
 
-- [CLAUDE.md](CLAUDE.md) — Project conventions and pipeline architecture
+- [CLAUDE.md](CLAUDE.md) — Project conventions, pipeline architecture, deployment gotchas
 - [docs/fetch.md](docs/fetch.md) — Plan criteria and rules reference
 - [docs/menu-guide.md](docs/menu-guide.md) — How to write menu entries for best pairings

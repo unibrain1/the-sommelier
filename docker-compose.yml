@@ -1,3 +1,4 @@
+# Customize: user, ports, dns, traefik labels for your environment
 services:
   wine-planner:
     build: .
