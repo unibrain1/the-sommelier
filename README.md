@@ -208,5 +208,4 @@ The pairing engine matches your meal plan against your cellar and suggests wines
 ## Documentation
 
 - [CLAUDE.md](CLAUDE.md) — Project conventions, pipeline architecture, deployment gotchas
-- [docs/fetch.md](docs/fetch.md) — Plan criteria and rules reference
 - [docs/menu-guide.md](docs/menu-guide.md) — How to write menu entries for best pairings

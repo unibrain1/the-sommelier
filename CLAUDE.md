@@ -51,7 +51,6 @@ scripts/
   compare.py                  — inventory.json + plan.json → report.json
   pairing.py                  — menu.json + plan.json + inventory.json → pairing_suggestions.json
 docs/
-  fetch.md                    — Plan criteria and rules reference
   menu-guide.md               — How to write menu entries for best pairing results
 data/                         — Staging area + generated artifacts (gitignored)
   plan.json                   — Staged plan (copied to site/ after notes generated)
@@ -118,7 +117,7 @@ Notes come from Claude (augmented with CT notes/food tags). Scheduling decisions
 
 ## Plan Generation Rules
 
-See `docs/fetch.md` for the complete rules reference:
+Implemented in `scripts/generate_plan.py`:
 - Cadence: 1 bottle/week, 52 weeks, starting current Monday
 - Priority: past peak → expiring → peak window → entering window → long-agers (held)
 - Long-ager hold: BeginConsume > current_year + 2, or hold back 2 if 3+ bottles
