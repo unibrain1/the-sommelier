@@ -3,8 +3,30 @@
 .picklist-page {
   background: white;
   padding: 24px;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
+}
+
+.week-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.notes-col {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  max-width: 150px;
 }
 
 .picklist-page h1 {
@@ -116,7 +138,7 @@ tbody tr:hover { background: #faf8f5; }
 /* Print styles */
 @media print {
   .picklist-page { padding: 12px; }
-  .back-link { display: none; }
+  .back-link, .week-filter { display: none; }
   table { font-size: 10px; }
   thead th { font-size: 9px; }
   tbody td { padding: 4px; }

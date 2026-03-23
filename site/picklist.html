@@ -15,6 +15,14 @@
 <h1>Cellar Pick List</h1>
 <div class="subtitle" id="subtitle">Loading...</div>
 
+<div class="week-filter" id="week-filter">
+  <span class="filter-label">Show:</span>
+  <button class="filter-btn" onclick="setRange(2, this)">2 weeks</button>
+  <button class="filter-btn" onclick="setRange(4, this)">4 weeks</button>
+  <button class="filter-btn" onclick="setRange(8, this)">8 weeks</button>
+  <button class="filter-btn active" onclick="setRange(0, this)">All</button>
+</div>
+
 <table>
   <thead>
     <tr>
@@ -23,6 +31,7 @@
       <th class="date-col">Date</th>
       <th>Type</th>
       <th>Wine</th>
+      <th>Notes</th>
       <th>Location</th>
     </tr>
   </thead>
@@ -33,96 +42,49 @@
 <div class="total" id="total"></div>
 
 <script>
-Promise.all([
-  fetch('plan.json').then(function(r) { return r.json(); }),
-  fetch('pairing_suggestions.json').then(function(r) { return r.json(); }).catch(function() { return { suggestions: [] }; }),
-  fetch('report.json').then(function(r) { return r.json(); }).catch(function() { return {}; })
-]).then(function(results) {
-  var plan = results[0];
-  var pairings = (results[1] && results[1].suggestions) || [];
-  var report = results[2] || {};
-  var weeks = plan.allWeeks;
+var allRows = [];
+var currentRange = 0; // 0 = all
+
+function setRange(weeks, btn) {
+  currentRange = weeks;
+  document.querySelectorAll('.week-filter .filter-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  renderPickList();
+}
+
+function renderPickList() {
   var body = document.getElementById('picklist-body');
+  body.textContent = '';
   var currentSeason = '';
   var totalBottles = 0;
-
-  // Build location index from report's inventory data if available
-  // (report.json doesn't have location, so we'll leave it empty for now
-  //  — location data will be added when generate_plan includes it)
-
-  var rows = [];
-
-  weeks.forEach(function(w) {
-    rows.push({
-      week: w.week, date: w.date, vintage: w.vintage, name: w.name,
-      badge: w.badge, urgent: w.urgent, season: w.season, type: 'planned',
-      location: w.location || ''
-    });
-  });
-
-  // Build set of all planned wines (vintage|name) for dedup
-  var plannedWines = {};
-  rows.forEach(function(r) {
-    plannedWines[r.vintage + '|' + r.name] = true;
-  });
-
-  // Add pairing suggestion bottles that aren't already in the plan
-  var pairingKeys = {};
-  pairings.forEach(function(p) {
-    if (!p.suggested_bottle) return;
-    var sb = p.suggested_bottle;
-    var wineKey = sb.vintage + '|' + sb.wine;
-
-    // Skip if this wine is already planned anywhere
-    if (plannedWines[wineKey]) return;
-    // Skip duplicate suggestions
-    if (pairingKeys[wineKey]) return;
-    pairingKeys[wineKey] = true;
-
-    // Find which plan week this meal falls in
-    var weekNum = '', weekDate = p.date;
-    var pd = new Date(p.date + 'T12:00:00');
-    for (var wi = 0; wi < weeks.length; wi++) {
-      // Parse "Mar 16, 2026" format
-      var ws = new Date(weeks[wi].date);
-      var we = new Date(ws); we.setDate(we.getDate() + 6);
-      if (pd >= ws && pd <= we) {
-        weekNum = weeks[wi].week;
-        weekDate = weeks[wi].date;
-        break;
-      }
-    }
-    if (!weekNum && weeks.length > 0) {
-      weekNum = weeks[0].week;
-      weekDate = weeks[0].date;
-    }
-
-    var badge = (sb.type || 'Red').toLowerCase().replace('rosé', 'rose');
-    rows.push({
-      week: weekNum, date: weekDate, vintage: String(sb.vintage), name: sb.wine,
-      badge: badge, urgent: false, season: '', type: 'pairing',
-      location: sb.location || ''
-    });
-  });
-
-  // Sort by week, then planned before pairing
-  rows.sort(function(a, b) {
-    var wDiff = (a.week || 999) - (b.week || 999);
-    if (wDiff !== 0) return wDiff;
-    if (a.type === 'planned' && b.type === 'pairing') return -1;
-    if (a.type === 'pairing' && b.type === 'planned') return 1;
-    return 0;
-  });
-
   var seasonNames = { spring: 'Spring', summer: 'Summer', fall: 'Fall', winter: 'Winter' };
 
-  rows.forEach(function(r) {
-    if (r.type === 'planned' && r.season !== currentSeason) {
+  var filtered = allRows;
+  if (currentRange > 0) {
+    var minWeek = Math.min.apply(null, allRows.filter(function(r) { return r.week; }).map(function(r) { return r.week; }));
+    var maxWeek = minWeek + currentRange - 1;
+    filtered = allRows.filter(function(r) { return r.week && r.week <= maxWeek; });
+  }
+
+  // Within the displayed range, skip pairing bottles that are also planned in this range
+  var plannedInRange = {};
+  filtered.forEach(function(r) {
+    if (r.type === 'planned') plannedInRange[r.vintage + '|' + r.name] = true;
+  });
+  filtered = filtered.filter(function(r) {
+    if (r.type === 'pairing' && plannedInRange[r.vintage + '|' + r.name]) return false;
+    return true;
+  });
+
+  filtered.forEach(function(r) {
+    if (r.type === 'planned' && r.season && r.season !== currentSeason) {
       currentSeason = r.season;
       var headerRow = document.createElement('tr');
       headerRow.className = 'section-header';
       var headerCell = document.createElement('td');
-      headerCell.colSpan = 6;
+      headerCell.colSpan = 7;
       headerCell.textContent = seasonNames[r.season] || r.season;
       headerRow.appendChild(headerCell);
       body.appendChild(headerRow);
@@ -134,6 +96,7 @@ Promise.all([
 
     var typeLabel = r.badge === 'rose' ? 'Rosé' : r.badge.charAt(0).toUpperCase() + r.badge.slice(1);
 
+    // Checkbox
     var tdCheck = document.createElement('td');
     tdCheck.className = 'check';
     var cb = document.createElement('input');
@@ -141,16 +104,19 @@ Promise.all([
     tdCheck.appendChild(cb);
     tr.appendChild(tdCheck);
 
+    // Week
     var tdWk = document.createElement('td');
     tdWk.className = 'wk';
     tdWk.textContent = r.week || '';
     tr.appendChild(tdWk);
 
+    // Date
     var tdDate = document.createElement('td');
     tdDate.className = 'date-col';
     tdDate.textContent = r.date || '';
     tr.appendChild(tdDate);
 
+    // Type badge
     var tdType = document.createElement('td');
     var badgeEl = document.createElement('span');
     badgeEl.className = 'type-badge type-' + r.badge;
@@ -158,6 +124,7 @@ Promise.all([
     tdType.appendChild(badgeEl);
     tr.appendChild(tdType);
 
+    // Wine name
     var tdWine = document.createElement('td');
     tdWine.className = 'wine-col';
     if (r.type === 'pairing') {
@@ -173,6 +140,13 @@ Promise.all([
     tdWine.appendChild(document.createTextNode(' ' + r.name));
     tr.appendChild(tdWine);
 
+    // Notes (pairing context or occasion)
+    var tdNotes = document.createElement('td');
+    tdNotes.className = 'notes-col';
+    tdNotes.textContent = r.notes || '';
+    tr.appendChild(tdNotes);
+
+    // Location
     var tdLoc = document.createElement('td');
     tdLoc.className = 'loc';
     tdLoc.textContent = r.location;
@@ -182,9 +156,83 @@ Promise.all([
     totalBottles++;
   });
 
+  document.getElementById('total').textContent = totalBottles + ' bottles' +
+    (currentRange > 0 ? ' (showing ' + currentRange + ' weeks)' : ' total');
+}
+
+// Load data
+Promise.all([
+  fetch('plan.json').then(function(r) { return r.json(); }),
+  fetch('pairing_suggestions.json').then(function(r) { return r.json(); }).catch(function() { return { suggestions: [] }; })
+]).then(function(results) {
+  var plan = results[0];
+  var pairings = (results[1] && results[1].suggestions) || [];
+  var weeks = plan.allWeeks;
+
+  // Build planned rows
+  weeks.forEach(function(w) {
+    allRows.push({
+      week: w.week, date: w.date, vintage: w.vintage, name: w.name,
+      badge: w.badge, urgent: w.urgent, season: w.season, type: 'planned',
+      location: w.location || '',
+      notes: w.occasion || ''
+    });
+  });
+
+  // Add all pairing suggestions (dedup happens at render time within displayed range)
+  var pairingKeys = {};
+  pairings.forEach(function(p) {
+    if (!p.suggested_bottle) return;
+    var sb = p.suggested_bottle;
+    var wineKey = sb.vintage + '|' + sb.wine;
+
+    // Skip duplicate suggestions
+    if (pairingKeys[wineKey]) return;
+    pairingKeys[wineKey] = true;
+
+    // Find week
+    var weekNum = '', weekDate = p.date;
+    var pd = new Date(p.date + 'T12:00:00');
+    for (var wi = 0; wi < weeks.length; wi++) {
+      var ws = new Date(weeks[wi].date);
+      var we = new Date(ws); we.setDate(we.getDate() + 6);
+      if (pd >= ws && pd <= we) {
+        weekNum = weeks[wi].week;
+        weekDate = weeks[wi].date;
+        break;
+      }
+    }
+    if (!weekNum && weeks.length > 0) {
+      weekNum = weeks[0].week;
+      weekDate = weeks[0].date;
+    }
+
+    var badge = (sb.type || 'Red').toLowerCase().replace('rosé', 'rose');
+    allRows.push({
+      week: weekNum, date: weekDate, vintage: String(sb.vintage), name: sb.wine,
+      badge: badge, urgent: false, season: '', type: 'pairing',
+      location: sb.location || '',
+      notes: 'for: ' + p.meal.split('\n')[0].substring(0, 30)
+    });
+  });
+
+  // Sort: week asc, planned before pairing
+  allRows.sort(function(a, b) {
+    var wDiff = (a.week || 999) - (b.week || 999);
+    if (wDiff !== 0) return wDiff;
+    if (a.type === 'planned' && b.type === 'pairing') return -1;
+    if (a.type === 'pairing' && b.type === 'planned') return 1;
+    return 0;
+  });
+
   document.getElementById('subtitle').textContent =
-    totalBottles + ' bottles \u00b7 Generated ' + (plan.changelog ? plan.changelog.date : 'today');
-  document.getElementById('total').textContent = totalBottles + ' bottles total';
+    allRows.length + ' bottles · Generated ' + (plan.changelog ? plan.changelog.date : 'today');
+
+  // Default to 4 weeks
+  currentRange = 4;
+  document.querySelectorAll('.week-filter .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.week-filter .filter-btn')[1].classList.add('active');
+  renderPickList();
 });
 </script>
 </body>
