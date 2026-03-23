@@ -755,10 +755,17 @@ def generate_plan(inventory: list[dict]) -> dict:
 
     all_weeks: list[dict] = []
 
+    # Detect when the season cycles back to the start — those weeks are year 2
+    start_season = season_for_date(week_dates[0])
+    seen_seasons: set[str] = set()
+    plan_year = 1
+
     for i, week_date in enumerate(week_dates):
         week_num = i + 1
-        plan_year = 1
         season = season_for_date(week_date)
+        if season == start_season and len(seen_seasons) >= 3:
+            plan_year = 2
+        seen_seasons.add(season)
 
         if i in reserved:
             slot = reserved[i]
