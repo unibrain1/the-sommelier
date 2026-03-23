@@ -60,20 +60,30 @@ Promise.all([
     });
   });
 
-  // Track pairing suggestions already added to avoid duplicates
-  var pairingKeys = {};
+  // Build set of all planned wines (vintage|name) for dedup
+  var plannedWines = {};
+  rows.forEach(function(r) {
+    plannedWines[r.vintage + '|' + r.name] = true;
+  });
 
+  // Add pairing suggestion bottles that aren't already in the plan
+  var pairingKeys = {};
   pairings.forEach(function(p) {
     if (!p.suggested_bottle) return;
     var sb = p.suggested_bottle;
-    var key = sb.vintage + '|' + sb.wine;
-    if (pairingKeys[key]) return;
-    pairingKeys[key] = true;
+    var wineKey = sb.vintage + '|' + sb.wine;
 
-    // Find which plan week this pairing falls in
+    // Skip if this wine is already planned anywhere
+    if (plannedWines[wineKey]) return;
+    // Skip duplicate suggestions
+    if (pairingKeys[wineKey]) return;
+    pairingKeys[wineKey] = true;
+
+    // Find which plan week this meal falls in
     var weekNum = '', weekDate = p.date;
     var pd = new Date(p.date + 'T12:00:00');
     for (var wi = 0; wi < weeks.length; wi++) {
+      // Parse "Mar 16, 2026" format
       var ws = new Date(weeks[wi].date);
       var we = new Date(ws); we.setDate(we.getDate() + 6);
       if (pd >= ws && pd <= we) {
@@ -82,13 +92,9 @@ Promise.all([
         break;
       }
     }
-    // If before first week, attach to week 1
     if (!weekNum && weeks.length > 0) {
-      var firstWs = new Date(weeks[0].date);
-      if (pd < firstWs) {
-        weekNum = weeks[0].week;
-        weekDate = weeks[0].date;
-      }
+      weekNum = weeks[0].week;
+      weekDate = weeks[0].date;
     }
 
     var badge = (sb.type || 'Red').toLowerCase().replace('rosé', 'rose');
