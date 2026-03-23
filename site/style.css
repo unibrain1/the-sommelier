@@ -32,30 +32,48 @@ body {
   min-height: 100vh;
 }
 
-/* Header */
+/* ═══════════════════════════════════════
+   HEADER — masthead layout
+   Brand left, stats right, vertically centered
+   ═══════════════════════════════════════ */
 header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 52px 48px 44px;
+  padding: 40px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
 }
 
-.eyebrow {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-weight: 500;
-  margin-bottom: 16px;
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.header-logo {
+  height: 120px;
+  width: 120px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.header-text {
+  flex: 1;
 }
 
 h1 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
   font-weight: 500;
   line-height: 1.1;
   color: var(--heading);
   letter-spacing: -0.01em;
+  margin-bottom: 4px;
 }
 
 h1 em {
@@ -64,11 +82,20 @@ h1 em {
   font-weight: 400;
 }
 
-.header-sub {
-  font-size: 14px;
+.header-tagline {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-style: italic;
   color: var(--muted);
-  margin-top: 10px;
-  letter-spacing: 0.1px;
+  margin-bottom: 4px;
+}
+
+.header-sub {
+  font-size: 12px;
+  color: var(--border-strong);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
 }
 
 .header-updated {
@@ -78,22 +105,28 @@ h1 em {
   font-style: italic;
 }
 
+/* Stats — right column */
 .stats {
   display: flex;
   gap: 0;
-  margin-top: 32px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  padding-left: 48px;
+  border-left: 1px solid var(--border);
 }
 
 .stat {
-  padding-right: 32px;
-  margin-right: 32px;
+  padding: 0 28px;
   border-right: 1px solid var(--border);
+  text-align: center;
+}
+
+.stat:first-child {
+  padding-left: 0;
 }
 
 .stat:last-child {
   border-right: none;
-  margin-right: 0;
   padding-right: 0;
 }
 
@@ -108,16 +141,19 @@ h1 em {
 }
 
 .stat-lbl {
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-size: 10px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
   color: var(--muted);
   display: block;
-  margin-top: 4px;
+  margin-top: 6px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
-/* Tabs */
+/* ═══════════════════════════════════════
+   TABS
+   ═══════════════════════════════════════ */
 .year-tabs {
   display: flex;
   background: var(--surface);
@@ -149,7 +185,9 @@ h1 em {
 .year-tab:hover { color: var(--heading); }
 .year-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* Legend */
+/* ═══════════════════════════════════════
+   LEGEND (unused but kept for structure)
+   ═══════════════════════════════════════ */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -179,7 +217,9 @@ h1 em {
   flex-shrink: 0;
 }
 
-/* Filter bar */
+/* ═══════════════════════════════════════
+   FILTER BAR — sticky with refined shadow
+   ═══════════════════════════════════════ */
 .controls {
   padding: 12px 48px;
   display: flex;
@@ -237,7 +277,9 @@ h1 em {
   flex-shrink: 0;
 }
 
-/* Quarters */
+/* ═══════════════════════════════════════
+   QUARTERS — seasonal section headers
+   ═══════════════════════════════════════ */
 .quarter { padding: 48px 48px 0; }
 
 .quarter-header {
@@ -274,7 +316,9 @@ h1 em {
   font-style: italic;
 }
 
-/* Grid */
+/* ═══════════════════════════════════════
+   WEEK CARDS — the core content
+   ═══════════════════════════════════════ */
 .weeks-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -282,7 +326,6 @@ h1 em {
   padding-bottom: 48px;
 }
 
-/* Cards */
 .week-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -454,7 +497,9 @@ h1 em {
   padding-left: 10px;
 }
 
-/* Calendar view */
+/* ═══════════════════════════════════════
+   CALENDAR VIEW
+   ═══════════════════════════════════════ */
 #calendar-view {
   display: none;
   padding: 48px;
@@ -613,7 +658,9 @@ h1 em {
 .cal-flag.evolution { background: var(--evolution-bg); color: var(--evolution); }
 .cal-flag.occasion  { background: #f5edd8; color: var(--white-wine); }
 
-/* What Changed view */
+/* ═══════════════════════════════════════
+   CHANGELOG VIEW
+   ═══════════════════════════════════════ */
 #changelog-view {
   display: none;
   padding: 48px;
@@ -748,20 +795,35 @@ footer strong { color: var(--text); font-weight: 600; }
 #plan-view { display: block; }
 #plan-view.hidden { display: none; }
 
-/* Responsive — mobile */
+/* ═══════════════════════════════════════
+   RESPONSIVE — mobile
+   ═══════════════════════════════════════ */
 @media (max-width: 640px) {
-  header { padding: 32px 16px 28px; }
+  header {
+    padding: 28px 16px 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .header-logo {
+    height: 80px;
+    width: 80px;
+  }
 
   .stats {
+    padding-left: 0;
+    border-left: none;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+    width: 100%;
   }
 
   .stat {
     border-right: none;
-    margin-right: 0;
-    padding-right: 0;
+    padding: 0;
+    text-align: left;
     border-bottom: 1px solid var(--border);
     padding-bottom: 16px;
   }
@@ -789,9 +851,24 @@ footer strong { color: var(--text); font-weight: 600; }
   .empty-state { padding: 40px 16px; }
 }
 
-/* Responsive — tablet */
-@media (min-width: 641px) and (max-width: 768px) {
-  header { padding: 40px 28px 36px; }
+/* ═══════════════════════════════════════
+   RESPONSIVE — tablet
+   ═══════════════════════════════════════ */
+@media (min-width: 641px) and (max-width: 1024px) {
+  header {
+    padding: 32px 28px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .stats {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+
   .year-tabs { padding: 0 28px; }
   .legend    { padding: 12px 28px; }
   .controls  { padding: 12px 28px; }
@@ -800,7 +877,9 @@ footer strong { color: var(--text); font-weight: 600; }
   #changelog-view { padding: 28px; }
 }
 
-/* Pairing indicator on cards */
+/* ═══════════════════════════════════════
+   PAIRING INDICATORS
+   ═══════════════════════════════════════ */
 .pairing-row {
   display: flex;
   align-items: center;
@@ -829,7 +908,6 @@ footer strong { color: var(--text); font-weight: 600; }
   border: 1px solid var(--border);
   color: var(--muted);
 }
-
 
 .pairing-row .pairing-icon {
   flex-shrink: 0;

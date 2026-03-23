@@ -58,7 +58,7 @@ pipeline.sh                   — Shared pipeline logic (sourced by fetch.sh and
 fetch.sh                      — Local pipeline entry point
 fetch_docker.sh               — Docker pipeline entry point
 Dockerfile                    — Python 3.12 + nginx + 1Password + Claude CLI + supercronic + git
-docker-compose.yml            — wine-planner on port 8089 + Traefik proxy + run-now profile
+docker-compose.yml            — the-sommelier on port 8089 + Traefik proxy + run-now profile
 entrypoint.sh                 — git pull, starts nginx, schedules cron, runs initial sync
 nginx.conf                    — Serves site/ directory on port 8080 (non-root)
 requirements.txt              — Python dependencies (icalendar)
@@ -85,7 +85,7 @@ docker compose down && docker compose up -d
 docker compose run --rm run-now
 ```
 
-Container: `wine-planner`. Runs as non-root (configurable UID/GID in compose). Uses supercronic.
+Container: `the-sommelier`. Runs as non-root (configurable UID/GID in compose). Uses supercronic.
 Sync schedule configurable via `SYNC_SCHEDULE` env var (default: `0 2 * * *`).
 
 Self-updating: container does `git pull` on startup and before each pipeline run.

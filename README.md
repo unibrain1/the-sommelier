@@ -1,6 +1,12 @@
-# Wine Plan
+# The Sommelier
 
-A personal wine cellar management system that generates a weekly drinking plan from your [CellarTracker](https://www.cellartracker.com) inventory and pairs wines with your meal plan.
+<p align="center">
+  <img src="docs/images/logo.png" alt="The Sommelier" width="350">
+</p>
+
+![The Sommelier](docs/images/screenshot.png)
+
+Don't let good wine go to waste. The Sommelier is your personal wine advisor — it connects to your [CellarTracker](https://www.cellartracker.com) cellar and generates a 52-week drinking plan that prioritizes bottles past their peak or nearing the end of their drinking window. It fits wines to seasons, anchors special bottles to holidays, and reads your meal plan from Google Calendar to suggest specific pairings from your cellar. Claude adds contextual tasting notes for every bottle. The pipeline runs nightly in a Docker container and publishes a self-updating web app — so your plan always reflects what's actually in your cellar.
 
 ## How It Works
 
@@ -35,10 +41,11 @@ Self-updating: push code to GitHub, next pipeline run picks it up automatically.
 ### Prerequisites
 
 - Python 3.12+
-- [1Password CLI](https://developer.1password.com/docs/cli/) (`op`) — or see [Without 1Password](#without-1password)
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (`claude`) — optional, for tasting notes
 - A [CellarTracker](https://www.cellartracker.com) account
 - A Google Calendar with meal plans — see [Menu Plan Setup](#menu-plan-setup)
+- [1Password CLI](https://developer.1password.com/docs/cli/) (`op`) — optional, see [Without 1Password](#without-1password)
+- [Paprika](https://www.paprikaapp.com) — optional, syncs meal plans to Google Calendar
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (`claude`) — optional, for tasting notes
 
 ### Setup
 
@@ -69,7 +76,7 @@ docker compose down && docker compose up -d
 docker compose run --rm run-now
 ```
 
-Container: `wine-planner`. Schedule configurable via `SYNC_SCHEDULE` env var.
+Container: `the-sommelier`. Schedule configurable via `SYNC_SCHEDULE` env var.
 Runs as non-root (configure `user` in docker-compose.yml to match your host UID/GID).
 
 ## Menu Plan Setup

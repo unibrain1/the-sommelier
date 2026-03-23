@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "==> Starting wine plan service..."
+echo "==> Starting The Sommelier..."
 
 # Self-update from git
 git config --global --add safe.directory /app

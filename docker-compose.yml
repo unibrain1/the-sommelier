@@ -1,8 +1,8 @@
 # Customize: user, ports, dns, traefik labels for your environment
 services:
-  wine-planner:
+  the-sommelier:
     build: .
-    container_name: wine-planner
+    container_name: the-sommelier
     user: "1000:1000"
     env_file:
       - .env
@@ -15,10 +15,10 @@ services:
       - 8.8.4.4
     labels:
       traefik.enable: 'true'
-      traefik.http.routers.wine-planner.entrypoints: https
-      traefik.http.routers.wine-planner.rule: Host(`wine-planner.unibrain.org`)
-      traefik.http.routers.wine-planner.tls: 'true'
-      traefik.http.services.wine-planner.loadbalancer.server.port: '8080'
+      traefik.http.routers.the-sommelier.entrypoints: https
+      traefik.http.routers.the-sommelier.rule: Host(`the-sommelier.unibrain.org`)
+      traefik.http.routers.the-sommelier.tls: 'true'
+      traefik.http.services.the-sommelier.loadbalancer.server.port: '8080'
     networks:
       - traefik_proxy
     ports:
@@ -27,7 +27,7 @@ services:
 
   run-now:
     build: .
-    container_name: wine-planner-run
+    container_name: the-sommelier-run
     user: "1000:1000"
     env_file:
       - .env
