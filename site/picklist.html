@@ -60,15 +60,15 @@ Promise.all([
     });
   });
 
-  var plannedKeys = {};
-  rows.forEach(function(r) { plannedKeys[r.vintage + '|' + r.name] = true; });
+  // Track pairing suggestions already added to avoid duplicates
+  var pairingKeys = {};
 
   pairings.forEach(function(p) {
     if (!p.suggested_bottle) return;
     var sb = p.suggested_bottle;
     var key = sb.vintage + '|' + sb.wine;
-    if (plannedKeys[key]) return;
-    plannedKeys[key] = true;
+    if (pairingKeys[key]) return;
+    pairingKeys[key] = true;
 
     var weekNum = '', weekDate = p.date;
     weeks.forEach(function(w) {
