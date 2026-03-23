@@ -97,25 +97,12 @@ These rules govern how bottles are scheduled. Update this section if the criteri
 
 ### Evolution Tracking
 
-Open one bottle per year from each of these labels to monitor development. Pick the most urgent vintage within the drinking window each year:
+Configured in `scripts/plan_config.py`. Open one bottle per year from each tracked label to monitor development. The generator picks the most urgent vintage within the drinking window and schedules it in the preferred month.
 
-- Domaine Drouhin Oregon Pinot Noir **Laurène** — schedule in fall (Oct–Nov), Thanksgiving week preferred
-- Domaine Drouhin Oregon Pinot Noir **Louise** — schedule in winter (Dec), holiday dinner preferred
-- Drouhin Oregon **Roserock** Pinot Noir — schedule in winter (Feb), Valentine's week preferred
+### Hold-Back Rules (automatic)
 
-### Long-Ager Hold List
-
-Do not schedule these unless `EndConsume` is within 2 years or explicitly requested:
-
-- DDO Roserock 2022, 2024
-- DDO Laurène 2021, 2022, 2023
-- DDO Louise 2021, 2022, 2023
-- DDO Pinot Noir 2019, 2022, 2024
-- Caymus Cabernet Sauvignon 2023
-- DDO Arthur Chardonnay 2023, 2024
-- Adamant Cab Don't Be a Dull Boy 2021 (hold 2 bottles minimum)
-- DDO Origine 36, 37
-- Dion Old Vines 2020, 2021
+- **Long-ager hold**: `BeginConsume > current year + 2` — not scheduled
+- **Quantity hold-back**: 3+ bottles of the same wine → schedule at most `qty - 2` (minimum 1)
 
 ### Past-Peak Handling
 
