@@ -264,7 +264,7 @@ function renderChangelog() {
   // Table
   var table = document.createElement('table');
   table.className = 'changelog-table';
-  table.innerHTML = '<thead><tr><th>Date</th><th>Added</th><th>Removed</th></tr></thead>';
+  table.innerHTML = '<thead><tr><th>Date</th><th>Added</th><th>Removed</th><th>Adjusted</th></tr></thead>';
   var tbody = document.createElement('tbody');
 
   history.forEach(function(entry) {
@@ -278,6 +278,7 @@ function renderChangelog() {
 
     tr.appendChild(renderChangeCell(entry.changes, 'added'));
     tr.appendChild(renderChangeCell(entry.changes, 'removed'));
+    tr.appendChild(renderChangeCell(entry.changes, 'adjusted'));
 
     tbody.appendChild(tr);
   });
@@ -287,13 +288,14 @@ function renderChangelog() {
 }
 
 function renderChangeCell(changes, type) {
-  var items = changes.filter(function(c) { return c.type === type; });
+  var items = (changes || []).filter(function(c) { return c.type === type; });
   var td = document.createElement('td');
   if (items.length) {
     items.forEach(function(c) {
       var div = document.createElement('div');
       div.className = 'changelog-wine changelog-' + type;
-      div.innerHTML = '<span class="changelog-wine-pill">Wk ' + c.week + '</span>' + escapeHtml(c.description);
+      var pill = c.week != null ? '<span class="changelog-wine-pill">Wk ' + c.week + '</span>' : '';
+      div.innerHTML = pill + escapeHtml(c.description);
       td.appendChild(div);
     });
   } else {
@@ -443,6 +445,11 @@ Promise.all([
   document.getElementById('stat-pairings').textContent  = pairingSuggestions.filter(function(s){ return s.pairing; }).length;
   populateLegend();
   renderPlan();
+}).catch(function(err) {
+  document.getElementById('plan').innerHTML =
+    '<div style="padding:48px;text-align:center;color:#8e8c84;">' +
+    '<h2>Unable to load the wine plan</h2>' +
+    '<p>Please try refreshing the page. (' + err.message + ')</p></div>';
 });
 </script>
 </body>

@@ -875,7 +875,7 @@ def main() -> None:
         try:
             old_data = json.loads(live_plan_path.read_text(encoding="utf-8"))
             old_weeks = old_data.get("allWeeks")
-            old_history = old_data.get("changelogHistory", [])
+            old_history = old_data.get("changelogHistory") or []
             # Back up the live plan
             previous_path.parent.mkdir(parents=True, exist_ok=True)
             previous_path.write_text(
