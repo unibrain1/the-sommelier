@@ -81,7 +81,7 @@ def parse_ics(ics_text: str) -> list[dict]:
     return entries
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: parse_menu.py <calendar.ics>", file=sys.stderr)
         sys.exit(1)

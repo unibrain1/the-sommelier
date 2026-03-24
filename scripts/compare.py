@@ -32,7 +32,7 @@ ALIASES = {
 }
 
 
-def expand_aliases(name_norm):
+def expand_aliases(name_norm: str) -> str:
     """Expand known abbreviations in a normalized plan name."""
     for abbr, full in sorted(ALIASES.items(), key=lambda x: -len(x[0])):
         if abbr in name_norm:
@@ -40,11 +40,13 @@ def expand_aliases(name_norm):
     return name_norm
 
 
-def tokenize(name):
+def tokenize(name: str) -> set[str]:
     return set(name.split())
 
 
-def match_score(plan_name, inv_name, plan_vintage, inv_vintage):
+def match_score(
+    plan_name: str, inv_name: str, plan_vintage: int | None, inv_vintage: int | None
+) -> float:
     """Score how well a plan bottle matches an inventory wine. Higher = better. 0 = no match."""
     if plan_vintage != inv_vintage:
         return 0
@@ -93,7 +95,9 @@ def match_score(plan_name, inv_name, plan_vintage, inv_vintage):
     return score
 
 
-def find_best_match(plan_bottle, inventory):
+def find_best_match(
+    plan_bottle: dict, inventory: list[dict]
+) -> tuple[dict | None, float]:
     """Find the best matching inventory wine for a plan bottle."""
     pv = plan_bottle.get("vintage")
     if isinstance(pv, str):
@@ -112,7 +116,7 @@ def find_best_match(plan_bottle, inventory):
     return (best, best_score) if best_score >= 40 else (None, 0)
 
 
-def compare(inventory, plan):
+def compare(inventory: list[dict], plan: list[dict]) -> dict:
     # Track which inventory wines are matched and how many times
     inv_plan_count = {}  # iWine -> count of plan references
 

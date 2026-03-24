@@ -36,21 +36,21 @@ KEEP_FIELDS = [
 ]
 
 
-def int_or_none(val):
+def int_or_none(val: str | None) -> int | None:
     try:
-        return int(val)
+        return int(val)  # type: ignore[arg-type]
     except (ValueError, TypeError):
         return None
 
 
-def float_or_none(val):
+def float_or_none(val: str | None) -> float | None:
     try:
-        return float(val)
+        return float(val)  # type: ignore[arg-type]
     except (ValueError, TypeError):
         return None
 
 
-def parse_inventory(tsv_path):
+def parse_inventory(tsv_path: str | Path) -> list[dict]:
     with open(tsv_path, encoding="latin-1") as f:
         reader = csv.DictReader(f, delimiter="\t")
         rows = list(reader)

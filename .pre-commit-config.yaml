@@ -19,6 +19,13 @@ repos:
         args: ['--fix']
       - id: ruff-format
 
+  # Python type checking
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.400
+    hooks:
+      - id: pyright
+        additional_dependencies: ['icalendar>=6.0.0']
+
   # Shell script linting
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
