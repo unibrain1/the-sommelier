@@ -43,6 +43,7 @@ scripts/
   plan_config.py              — Holidays + evolution tracks (gitignored, personal)
   plan_config.py.sample       — Template for plan_config.py
   wine_utils.py               — Shared: CURRENT_YEAR, TYPE_TO_BADGE, normalize, urgency_score
+  scoring.py                  — Composite scoring: window_position_score (+ future components)
   generate_plan.py            — Deterministic plan generator (rules-based)
   generate_notes.py           — Tasting notes (Claude CLI, augmented with CT notes/food tags)
   wine_keywords.py            — Single source of truth for food keywords and pairing rules
@@ -166,3 +167,4 @@ Implemented in `scripts/generate_plan.py`:
 - Plan is regenerated from scratch every pipeline run — no manual editing of `plan.json`
 - Plan staged to `data/plan.json`, only published to `site/` when complete with notes
 - Shared utilities in `scripts/wine_utils.py` — do not duplicate `urgency_score`, `normalize`, `TYPE_TO_BADGE`, or `CURRENT_YEAR` in individual scripts
+- Composite scoring functions in `scripts/scoring.py` — imports `CURRENT_YEAR` from `wine_utils`
