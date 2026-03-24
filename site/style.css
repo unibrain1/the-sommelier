@@ -439,23 +439,18 @@ h1 em {
 
 .occasion-tag {
   margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--accent);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.occasion-tag::before {
-  content: '';
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--accent);
-  flex-shrink: 0;
+  background: var(--accent-light);
+  border: 1px solid #e8c8d0;
+  border-radius: 999px;
 }
 
 .urgent-flag {

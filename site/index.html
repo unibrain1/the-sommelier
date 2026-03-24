@@ -69,6 +69,19 @@ let pairingSuggestions = [];
 
 const typeColors = { sparkling:'#29abe0', rose:'#e83e8c', white:'#c49b2a', red:'#8b3a3a' };
 
+function occasionIcon(occasion) {
+  if (!occasion) return '';
+  var o = occasion.toLowerCase();
+  if (o.includes('thanksgiving'))  return '🦃';
+  if (o.includes('christmas'))     return '🎄';
+  if (o.includes("new year"))      return '🥂';
+  if (o.includes('valentine'))     return '❤️';
+  if (o.includes('4th of july') || o.includes('july 4')) return '🇺🇸';
+  if (o.includes('anniversary'))   return '💍';
+  if (o.includes('birthday'))      return '🎂';
+  return '◆';
+}
+
 // SVG wine icons — each a distinct glass silhouette
 function wineIcon(badge, size) {
   size = size || 16;
@@ -206,7 +219,7 @@ function renderCalendar() {
         const flags = [];
         if (w.urgent)    flags.push('<span class="cal-flag urgent">⚠ Urgent</span>');
         if (w.evolution) flags.push('<span class="cal-flag evolution">◉ Evolution</span>');
-        if (w.occasion)  flags.push('<span class="cal-flag occasion">◆ ' + w.occasion + '</span>');
+        if (w.occasion)  flags.push('<span class="cal-flag occasion">' + occasionIcon(w.occasion) + ' ' + w.occasion + '</span>');
         else if (w.special && !w.evolution) flags.push('<span class="cal-flag special">◆ Special</span>');
         const entry = document.createElement('div');
         entry.className = 'cal-entry';
@@ -373,7 +386,7 @@ function renderPlan() {
           if (w.score)  html += '<div class="meta-item">Score <span>' + w.score + '</span></div>';
           html += '</div>';
         }
-        if (w.occasion)  html += '<div class="occasion-tag">' + w.occasion + '</div>';
+        if (w.occasion)  html += '<div class="occasion-tag">' + occasionIcon(w.occasion) + ' ' + w.occasion + '</div>';
         if (w.urgent)    html += '<div class="urgent-flag">Drink now — urgent</div>';
         if (w.evolution) html += '<div class="evolution-flag">Evolution track</div>';
         html += '<div class="note-text">' + w.note + '</div>';
