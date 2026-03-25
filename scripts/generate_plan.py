@@ -22,7 +22,13 @@ if "TZ" in os.environ:
 
 from plan_config import EVOLUTION_TRACKS, HOLIDAYS
 from scoring import composite_score
-from wine_utils import CURRENT_YEAR, TYPE_TO_BADGE, normalize, urgency_score
+from wine_utils import (
+    CURRENT_YEAR,
+    TYPE_TO_BADGE,
+    apply_default_windows,
+    normalize,
+    urgency_score,
+)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -885,6 +891,11 @@ def main() -> None:
             print(f"Previous plan backed up to {previous_path}")
         except (json.JSONDecodeError, OSError) as exc:
             print(f"Warning: could not read existing plan ({exc})", file=sys.stderr)
+
+    # Apply default drinking windows for wines missing CellarTracker data
+    defaulted = apply_default_windows(inventory)
+    if defaulted:
+        print(f"Applied default drinking windows to {defaulted} wine(s)")
 
     print(f"Generating plan from {len(inventory)} inventory wines…")
     plan_data = generate_plan(inventory)

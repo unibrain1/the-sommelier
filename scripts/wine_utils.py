@@ -82,3 +82,57 @@ def urgency_score(wine: dict) -> int:
     if begin is not None and begin in (CURRENT_YEAR, CURRENT_YEAR + 1):
         return 4
     return 5
+
+
+# ---------------------------------------------------------------------------
+# Default drinking windows for wines missing CellarTracker data
+# ---------------------------------------------------------------------------
+
+# Evaluation order matters — Sparkling before Color checks because CT lists
+# sparkling wines with Color: White.
+#
+#   NV (vintage < 2000 or > current year) → now  to now+2
+#   Sparkling                              → vintage to vintage+5
+#   Sweet/Dessert                          → vintage to vintage+20
+#   Rosé                                   → vintage to vintage+3
+#   White                                  → vintage to vintage+5
+#   Red                                    → vintage+2 to vintage+8
+
+
+def apply_default_windows(inventory: list[dict]) -> int:
+    """Fill in BeginConsume/EndConsume for wines missing both.
+
+    Mutates wine dicts in place.  Returns the number of wines updated.
+    """
+    count = 0
+    for wine in inventory:
+        if wine.get("BeginConsume") is not None or wine.get("EndConsume") is not None:
+            continue
+
+        vintage = wine.get("Vintage", 0)
+        wine_type = wine.get("Type", "")
+        color = wine.get("Color", "")
+        category = wine.get("Category", "")
+
+        # Non-vintage: vintage missing, nonsensical, or outside 2000–current year
+        if not vintage or vintage < 2000 or vintage > CURRENT_YEAR:
+            begin, end = CURRENT_YEAR, CURRENT_YEAR + 2
+        elif "Sparkling" in wine_type or category == "Sparkling":
+            begin, end = vintage, vintage + 5
+        elif category == "Sweet/Dessert":
+            begin, end = vintage, vintage + 20
+        elif color == "Rosé":
+            begin, end = vintage, vintage + 3
+        elif color == "White":
+            begin, end = vintage, vintage + 5
+        elif color == "Red":
+            begin, end = vintage + 2, vintage + 8
+        else:
+            begin, end = vintage, vintage + 5
+
+        wine["BeginConsume"] = begin
+        wine["EndConsume"] = end
+        wine["_defaultWindow"] = True
+        count += 1
+
+    return count
