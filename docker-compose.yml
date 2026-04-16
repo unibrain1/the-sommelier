@@ -11,9 +11,11 @@ services:
       - SYNC_SCHEDULE=0 2 * * *
     volumes:
       - ./:/app
+      - ~/.ssh/id_ed25519_ha:/run/secrets/ha_ssh_key:ro
     dns:
+      - 10.10.1.10
+      - 10.10.1.11
       - 8.8.8.8
-      - 8.8.4.4
     labels:
       traefik.enable: 'true'
       traefik.http.routers.the-sommelier.entrypoints: https
@@ -36,9 +38,11 @@ services:
       - TZ=America/Los_Angeles
     volumes:
       - ./:/app
+      - ~/.ssh/id_ed25519_ha:/run/secrets/ha_ssh_key:ro
     dns:
+      - 10.10.1.10
+      - 10.10.1.11
       - 8.8.8.8
-      - 8.8.4.4
     entrypoint: []
     command: ["bash", "/app/fetch_docker.sh"]
     networks:

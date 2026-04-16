@@ -113,6 +113,27 @@ cp data/plan.json site/plan.json
 cp data/pairing_suggestions.json site/pairing_suggestions.json
 cp data/report.json site/report.json
 
+# --- GENERATE HOME ASSISTANT JSON ---
+log "==> Generating Home Assistant JSON..."
+python3 scripts/thisweek.py data/plan.json > site/thisweek.json || log "WARNING: thisweek.py failed"
+python3 scripts/today.py data/pairing_suggestions.json > site/today.json || log "WARNING: today.py failed"
+
+# --- PUSH TO HOME ASSISTANT ---
+HA_SSH_KEY="/run/secrets/ha_ssh_key"
+if [[ -n "${HA_SSH_TARGET:-}" ]] && [[ -f "${HA_SSH_KEY}" ]]; then
+  log "==> Pushing to Home Assistant (${HA_SSH_TARGET})..."
+  HA_SSH_OPTS="-i ${HA_SSH_KEY} -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 -o BatchMode=yes"
+  # shellcheck disable=SC2086
+  if ssh ${HA_SSH_OPTS} "${HA_SSH_TARGET}" "sudo tee /config/www/thisweek.json > /dev/null" < site/thisweek.json \
+    && ssh ${HA_SSH_OPTS} "${HA_SSH_TARGET}" "sudo tee /config/www/today.json > /dev/null" < site/today.json; then
+    log "    Pushed thisweek.json + today.json to Home Assistant"
+  else
+    log "WARNING: Failed to push JSON to Home Assistant"
+  fi
+else
+  log "    Skipping Home Assistant push — HA_SSH_TARGET or SSH key not configured"
+fi
+
 log "==> Sync complete."
 
 # --- HEALTHCHECK PING (success) ---
