@@ -61,9 +61,10 @@ Plan and implement the current issue. Reads the issue from the current branch na
    ```text
    Implementation complete for issue #<number>. Next steps:
    1. Review the changes: `git diff`
-   2. `/commit`          — Commit your changes
-   3. `/commit-push-pr`  — Push and create a PR targeting milestone/<version>
-   4. `/finish-issue`    — Squash-merge and close the issue
+   2. `/simplify`        — Review changed code for reuse, quality, and efficiency
+   3. `/commit`          — Commit your changes
+   4. `/commit-push-pr`  — Push and create a PR targeting milestone/<version>
+   5. `/finish-issue`    — Squash-merge and close the issue
    ```
 
 ## Important
