@@ -9,8 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Claude Code CLI
-# hadolint ignore=DL3016
-RUN npm install -g @anthropic-ai/claude-code
+RUN npm install -g @anthropic-ai/claude-code@2.1.114
 
 # Install 1Password CLI (multi-arch: works on both amd64 and arm64)
 RUN ARCH=$(dpkg --print-architecture) \
