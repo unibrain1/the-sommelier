@@ -210,6 +210,7 @@ Implemented in `scripts/generate_plan.py`:
 - Shell scripts must have executable permission in git: `chmod +x *.sh && git add`
 - Docker volume mount requires `git config --global --add safe.directory /app` (handled in entrypoint)
 - Pre-commit hooks (ruff format) may modify files on first commit — re-stage and commit again
+- Claude Code CLI is version-pinned in the Dockerfile — update the pin deliberately when upgrading
 
 ## Important Conventions
 
