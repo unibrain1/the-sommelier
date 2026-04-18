@@ -130,6 +130,7 @@ function getPairingsForWeek(dateStr) {
   var weekStart = new Date(dateStr);
   var weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
   var results = [];
   var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   for (var i = 0; i < pairingSuggestions.length; i++) {
