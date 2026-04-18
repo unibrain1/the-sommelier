@@ -2,10 +2,12 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-# Source .env for 1Password references
-set -a
-source .env
-set +a
+# Source .env for 1Password references (may not exist in Docker)
+if [[ -f .env ]]; then
+  set -a
+  source .env
+  set +a
+fi
 
 # Resolve SMTP credentials from 1Password (skip for --dry-run)
 export SMTP_USERNAME SMTP_PASSWORD DIGEST_RECIPIENTS
