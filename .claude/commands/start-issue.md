@@ -1,54 +1,118 @@
-# Start Issue
+---
+description: Start work on a GitHub issue within a milestone workflow
+---
 
-Set up an issue branch and display the issue for review. Lightweight — no planning or implementation.
+# GitHub Issue Workflow Command
 
-## Arguments
+## Available Agents
 
-- `$ARGUMENTS` — the GitHub issue number (e.g., `16`)
+| Agent | `subagent_type` | Model | Use When |
+| --- | --- | --- | --- |
+| Explore | `Explore` | `haiku` | Codebase research |
+| Plan | `Plan` | `sonnet` | Implementation strategy |
+| Software Developer | `software-developer` | `sonnet` | **Primary coding agent** |
+| Senior Architect | `senior-architect` | `sonnet` | Architecture, security, code review |
+| Senior Product Manager | `senior-product-manager` | `sonnet` | Issue refinement, scope, criteria |
+| Senior Test Engineer | `senior-test-engineer` | `sonnet` | Test strategy and writing |
+| Technical Documentation Writer | `technical-documentation-writer` | `haiku` | Docs updates |
 
-## Workflow
+**Always invoke:** Explore (Step 5), senior-product-manager (Step 6), senior-architect (Step 7.3).
+**Always invoke for code changes:** software-developer, senior-test-engineer.
+**Skip** docs agent for internal refactoring; test agent for docs-only changes.
 
-1. **Verify we're on a milestone branch**:
+## Workflow Steps
 
-   ```bash
-   git branch --show-current
-   ```
+### Step 1: Ask for Issue Number (if not provided)
 
-   Must match `milestone/*`. If not, check if there is exactly one local `milestone/*` branch and switch to it. If zero or multiple, stop and ask the user to run `/start-milestone` first.
+### Step 2: Fetch Issue Details
 
-2. **Ensure clean working tree**:
+```bash
+gh issue view ISSUE_NUMBER --json number,title,body,milestone,labels
+```
 
-   ```bash
-   git status --porcelain
-   ```
+### Step 3: Verify Milestone Branch
 
-   If uncommitted changes exist, stop and ask the user to commit or stash.
+1. `git branch --show-current` — must match `milestone/*`
+   - Zero milestone branches: stop, tell user to run `/start-milestone` first
+   - Multiple: stop, ask which one
+2. **Branch naming** — `bug/` for bug label, `feature/` for enhancement, `issue/` for all others. Confirm name with user before creating.
 
-3. **Fetch the issue details**:
+### Step 4: Create Issue Branch
 
-   ```bash
-   gh issue view $ARGUMENTS --json number,title,body,milestone,labels
-   ```
+```bash
+git checkout -b BRANCH_NAME
+git push -u origin BRANCH_NAME
+```
 
-4. **Derive a short slug** from the issue title (lowercase, 4-5 meaningful words, hyphens).
+### Step 4.5: Update GitHub Issue
 
-5. **Create the issue branch**:
+```bash
+gh label create "in progress" --color 0075CA --description "Work is actively underway" 2>/dev/null || true
+gh issue edit ISSUE_NUMBER --add-label "in progress" --add-assignee @me
+```
 
-   ```bash
-   git checkout -b issue/$ARGUMENTS-<slug>
-   git push -u origin issue/$ARGUMENTS-<slug>
-   ```
+### Step 5: Launch Explore Agents (parallel)
 
-6. **Update the GitHub issue**:
+One agent per affected subsystem (`scripts/`, `site/`, `pipeline.sh`). Each agent must check:
+- `scripts/wine_utils.py`, `scripts/scoring.py`, `scripts/wine_keywords.py` — do not duplicate
+- `tests/` — existing coverage
+- For pipeline changes: which JSON contracts are produced/consumed (must not break `site/index.html`)
 
-   ```bash
-   gh issue edit $ARGUMENTS --add-label "in progress" --add-assignee @me
-   ```
+### Step 6: PM Assessment + User Interview
 
-   Create the "in progress" label first if it doesn't exist (use `#0075CA` blue).
+Launch **senior-product-manager** with the issue details and Explore results. Ask it to evaluate: completeness, missing acceptance criteria, decomposition needs, and questions for the user.
 
-7. **Output**:
-   - The issue branch name
-   - The issue title and body
-   - The milestone branch it will merge back into
-   - "Review the issue, then run `/implement` to plan and build it."
+Then interview the user **one question at a time**: scope clarity, LLM vs rules boundary, pipeline ordering concerns, edge cases.
+
+### Step 7: Plan Mode
+
+Use EnterPlanMode. While planning:
+
+1. Launch additional Explore agents as needed.
+2. Ask clarifying questions one at a time.
+3. **Pipeline impact check:** Does this change a JSON schema? Add a script to `pipeline.sh`? Require new env vars (update `.env.sample`)? Cross the LLM boundary?
+4. **Consult specialists in parallel** (Step 7.3):
+
+   - **senior-architect** (always): issue details + Explore results + proposed approach → review pipeline ordering, JSON contract integrity, shared utility placement, shell safety (`set -euo pipefail`), secret handling (`op read`)
+   - **senior-test-engineer** (code changes): propose test strategy covering unit tests, edge cases (empty inventory, missing menu, unavailable Claude CLI), JSON contract validation, regression risks
+   - **technical-documentation-writer** (when docs affected):
+
+     | Change | Docs |
+     |--------|------|
+     | New scripts/pipeline steps | CLAUDE.md directory + pipeline sections |
+     | New env vars | CLAUDE.md + `.env.sample` |
+     | Pairing/scoring changes | CLAUDE.md conventions + `docs/menu-guide.md` |
+     | Docker/HA changes | CLAUDE.md deployment/HA sections |
+
+5. Incorporate feedback into plan: Pipeline Considerations → Architecture → Implementation Steps → Test Plan → Docs Plan.
+
+### Step 8: Exit Plan Mode + Present for Approval
+
+### Step 9: Implement (after approval)
+
+1. Update issue with plan details.
+2. Launch parallel **software-developer** agents for independent files.
+3. Launch parallel post-implementation agents: **senior-test-engineer** (write + run tests), **technical-documentation-writer** (update docs).
+4. Validate: `python3 -m pytest tests/ -v` + `mcp__ide__getDiagnostics`
+5. Run `/security-review` — address Critical/High findings before proceeding.
+6. Launch **senior-architect** for final review: pipeline order, JSON contracts, shell safety, test coverage.
+7. Fix any issues, then hand off:
+
+```text
+Implementation complete for issue #ISSUE_NUMBER. Next steps:
+1. /simplify        — Review changed code (optional)
+2. /review-pr       — Multi-agent local review (recommended before push)
+3. /commit          — Commit your changes
+4. /commit-push-pr  — Push and create a PR targeting `MILESTONE_BRANCH`
+                      Include "Closes #ISSUE_NUMBER" in the PR body.
+5. /finish-issue    — Squash-merge, close the issue, return to milestone branch
+```
+
+> Do NOT run any of these steps automatically.
+
+## Key Constraints
+
+- **Never commit** — this command does not commit, push, or create PRs
+- **Issue PRs target the milestone branch**, never `main`
+- **LLM boundary**: only `generate_notes.py` and `enrich_menu.py` use Claude; everything else is scripted rules
+- **Pipeline order is sacred**: fetch → parse → plan → notes → enrich → pair → publish

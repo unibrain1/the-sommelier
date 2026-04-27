@@ -123,6 +123,13 @@ python3 -m pytest tests/ -v
 
 Tests require `pytest` (install via `pip install pytest`). The `conftest.py` at project root adds `scripts/` to `sys.path`. Pyright is configured to exclude `tests/` (see `pyrightconfig.json`).
 
+## Linting
+
+```bash
+ruff check scripts/ && ruff format --check scripts/  # check only
+ruff format scripts/                                   # auto-fix
+```
+
 ## Docker Deployment
 
 Production runs on **docker02**. To restart or rebuild the running application, SSH to docker02:
@@ -130,6 +137,9 @@ Production runs on **docker02**. To restart or rebuild the running application, 
 ```bash
 # SSH to production host
 ssh docker02
+
+# Project directory
+cd /home/ansible/container/the-sommelier
 
 # First time or Dockerfile changes
 docker compose up --build -d
@@ -139,6 +149,9 @@ docker compose down && docker compose up -d
 
 # One-shot test run
 docker compose run --rm run-now
+
+# View pipeline logs
+docker logs the-sommelier --tail 100
 ```
 
 Container: `the-sommelier`. Runs as non-root (configurable UID/GID in compose). Uses supercronic.
@@ -205,6 +218,14 @@ Implemented in `scripts/generate_plan.py`:
 - Each meal gets a unique suggestion
 - Varietal-aware: looks up inventory varietal for planned wines to improve matching
 
+## Home Assistant Integration
+
+- HA config is mounted locally at `/Volumes/config`
+- `thisweek.json` and `today.json` are pushed via SSH to `/config/www/` on HA during each pipeline run
+- HA reads them via REST sensors (`scan_interval: 3600`) defined in `/Volumes/config/configuration.yaml`
+- To force HA to re-poll immediately: **Developer Tools → Actions → `rest.reload`**
+- If HA push fails, check SSH key `~/.ssh/id_ed25519_ha` on docker02 and `authorized_keys` on HA
+
 ## Deployment Gotchas
 
 - Shell scripts must have executable permission in git: `chmod +x *.sh && git add`
@@ -220,4 +241,7 @@ Implemented in `scripts/generate_plan.py`:
 - Plan is regenerated from scratch every pipeline run — no manual editing of `plan.json`
 - Plan staged to `data/plan.json`, only published to `site/` when complete with notes
 - Shared utilities in `scripts/wine_utils.py` — do not duplicate `urgency_score`, `normalize`, `TYPE_TO_BADGE`, or `CURRENT_YEAR` in individual scripts
-- Composite scoring in `scripts/scoring.py` — `composite_score()` combines window position (50%), seasonal fit (25%), diversity (10%), CT quality (10%), community signals (5%). Community signals use RSS note data: recent score drift, note velocity, and text-based window drift detection. Lower score = schedule sooner. Plan labels show best available critic score (WA → WS → BH → AG → JR → JS → JG → CT). Also owns `seasonal_score()` and red-subtype helpers (moved from `generate_plan.py` to avoid circular imports)
+- Composite scoring in `scripts/scoring.py` — `composite_score()` combines: window position (50%), seasonal fit (25%), diversity (10%), CT quality (10%), community signals (5%). Lower score = schedule sooner.
+- Community signals use RSS note data: recent score drift, note velocity, text-based window drift detection
+- Plan labels show best available critic score: WA → WS → BH → AG → JR → JS → JG → CT
+- `scoring.py` also owns `seasonal_score()` and red-subtype helpers (moved from `generate_plan.py` to avoid circular imports)
