@@ -66,6 +66,7 @@
 let allWeeks = [];
 let quarterInfo = {};
 let pairingSuggestions = [];
+let planData = { allWeeks: [] };
 
 const typeColors = { sparkling:'#29abe0', rose:'#e83e8c', white:'#c49b2a', red:'#8b3a3a' };
 
@@ -373,7 +374,14 @@ function renderPlan() {
   const plan = document.getElementById('plan');
   plan.innerHTML = '';
   const filtered = getWeeks();
-  const seasons = ['spring','summer','fall','winter'];
+  // Rotate the season list so it starts with the plan's opening season.
+  // This keeps sections in chronological order when the plan starts mid-year
+  // (e.g. summer → fall → winter → spring, not spring → summer → …).
+  const allSeasons = ['spring','summer','fall','winter'];
+  const startSeason = (planData.allWeeks && planData.allWeeks.length > 0)
+    ? planData.allWeeks[0].season : 'spring';
+  const startIdx = allSeasons.indexOf(startSeason);
+  const seasons = allSeasons.slice(startIdx).concat(allSeasons.slice(0, startIdx));
   const years = currentYear === 'all' ? [1,2] : currentYear === 'y1' ? [1] : [2];
   years.forEach(function(yr) {
     const yrKey = yr === 1 ? 'y1' : 'y2';
@@ -466,7 +474,7 @@ Promise.all([
   fetch('plan.json').then(function(r) { return r.json(); }),
   fetch('pairing_suggestions.json').then(function(r) { return r.json(); }).catch(function() { return { suggestions: [] }; })
 ]).then(function(results) {
-  var planData = results[0];
+  planData    = results[0];
   allWeeks    = planData.allWeeks;
   quarterInfo = planData.quarterInfo;
   changelogHistory = planData.changelogHistory || [];

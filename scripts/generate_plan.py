@@ -442,24 +442,38 @@ _SEASON_MONTHS: dict[str, str] = {
 }
 
 
+_SEASON_ORDER: dict[str, int] = {"spring": 0, "summer": 1, "fall": 2, "winter": 3}
+
+
 def build_quarter_info(week_dates: list[date]) -> dict:
-    """Build the quarterInfo object from actual week dates."""
-    # Identify the calendar year for each plan year
+    """Build the quarterInfo object from actual week dates.
+
+    When the plan starts mid-year (e.g. summer), seasons that occur earlier in
+    the calendar year (e.g. spring) actually fall in the *next* calendar year
+    within year-1 of the plan.  Adjust titles accordingly.
+    """
     y1_year = week_dates[0].year
     y2_year = y1_year + 1
+    start_idx = _SEASON_ORDER[season_for_date(week_dates[0])]
 
     quarter_info: dict[str, dict] = {}
     for season in ("spring", "summer", "fall", "winter"):
         sub = _SEASON_MONTHS[season]
         desc = _SEASON_DESCRIPTIONS[season]
 
-        # Determine calendar year labels for winter (spans two years)
+        # Seasons that precede the start season in the cycle land in the next
+        # calendar year within the same plan year (e.g. Spring 2027 in y1 of a
+        # plan that starts in Summer 2026).
+        year_bump = 1 if _SEASON_ORDER[season] < start_idx else 0
+
         if season == "winter":
-            y1_title = f"Winter {y1_year}–{y1_year + 1}"
-            y2_title = f"Winter {y2_year}–{y2_year + 1}"
+            base1 = y1_year + year_bump
+            base2 = y2_year + year_bump
+            y1_title = f"Winter {base1}–{base1 + 1}"
+            y2_title = f"Winter {base2}–{base2 + 1}"
         else:
-            y1_title = f"{season.capitalize()} {y1_year}"
-            y2_title = f"{season.capitalize()} {y2_year}"
+            y1_title = f"{season.capitalize()} {y1_year + year_bump}"
+            y2_title = f"{season.capitalize()} {y2_year + year_bump}"
 
         quarter_info[season] = {
             "y1": {"title": y1_title, "sub": sub, "note": desc["y1"]},
