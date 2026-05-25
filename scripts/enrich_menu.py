@@ -30,6 +30,24 @@ ENRICHED_FIELDS = [
     "pairing_priorities",
 ]
 
+# Fields documented as scalar strings in the enrichment schema.
+# Claude occasionally returns a list for these; we normalize before caching.
+SCALAR_FIELDS: frozenset[str] = frozenset(
+    {
+        "protein",
+        "cut",
+        "preparation",
+        "sauce",
+        "sauce_intensity",
+        "cuisine",
+        "richness",
+        "acidity",
+        "sweetness",
+        "spice_heat",
+    }
+)
+# NOTE: sides, dominant_flavor_axis, pairing_priorities are intentional arrays — omit them.
+
 
 def text_hash(text: str) -> str:
     """Stable hash of menu text for cache keying."""
@@ -64,6 +82,7 @@ Rules:
 - Omit fields rather than guess — only include what's clearly implied by the menu text
 - For simple entries like "Leftovers" or "Pizza night", include what you can infer
 - Be concise in string values
+- Scalar fields (protein, cut, preparation, sauce, sauce_intensity, cuisine, richness, acidity, sweetness, spice_heat) must be a single string, not an array
 
 Return ONLY a JSON object mapping entry index to its features, like:
 {{"0": {{"protein": "pork", "preparation": "grilled", ...}}, "1": {{...}}}}
@@ -82,6 +101,46 @@ def load_cache(cache_path: Path) -> dict[str, dict]:
     return {}
 
 
+def _normalize_enriched(enriched: dict) -> dict:
+    """Coerce scalar fields to strings before caching.
+
+    Claude occasionally returns a list (e.g. protein=["salmon", "shrimp"]) or a
+    non-string scalar (e.g. richness=3) for fields documented as scalar strings.
+    This normalizes them so bad shapes never enter the cache.
+
+    - list  → first string element; if none, field is omitted
+    - non-string scalar (int, float, bool, …) → str(val)
+    - correct string → unchanged
+    - array fields (sides, dominant_flavor_axis, pairing_priorities) → untouched
+    """
+    result = dict(enriched)  # shallow copy — never mutate the caller's dict
+    for field in SCALAR_FIELDS:
+        val = result.get(field)
+        if val is None:
+            continue
+        if isinstance(val, list):
+            first = next((v for v in val if isinstance(v, str)), None)
+            if first is not None:
+                result[field] = first
+                print(
+                    f"WARNING: enrichment field '{field}' was a list — coerced to scalar",
+                    file=sys.stderr,
+                )
+            else:
+                del result[field]
+                print(
+                    f"WARNING: enrichment field '{field}' had no string elements — field omitted",
+                    file=sys.stderr,
+                )
+        elif not isinstance(val, str):
+            result[field] = str(val)
+            print(
+                f"WARNING: enrichment field '{field}' was {type(val).__name__} — coerced to string",
+                file=sys.stderr,
+            )
+    return result
+
+
 def enrich_menu(
     menu_path: Path, cache_path: Path, output_path: Path | None = None
 ) -> list[dict]:
@@ -96,8 +155,12 @@ def enrich_menu(
     for entry in menu:
         h = text_hash(entry["meal"])
         if h in cache:
+            normalized = _normalize_enriched(cache[h])
+            cache[h] = (
+                normalized  # update in-memory cache so _write_files repairs the file
+            )
             results.append(
-                {"raw": entry["meal"], "hash": h, "enriched": cache[h], **entry}
+                {"raw": entry["meal"], "hash": h, "enriched": normalized, **entry}
             )
         else:
             results.append({"raw": entry["meal"], "hash": h, "enriched": None, **entry})
@@ -128,6 +191,7 @@ def enrich_menu(
     for batch_idx, (result_idx, entry) in enumerate(to_enrich):
         enriched = enrichments.get(str(batch_idx))
         if enriched and isinstance(enriched, dict):
+            enriched = _normalize_enriched(enriched)
             h = results[result_idx]["hash"]
             results[result_idx]["enriched"] = enriched
             cache[h] = enriched
