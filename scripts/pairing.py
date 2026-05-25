@@ -178,9 +178,7 @@ def score_enriched_pairing(wine_name: str, enriched: dict) -> dict | None:
         # as scalars (e.g. protein=["salmon", "shrimp"] for a multi-protein dish).
         # Pick the first element that's a known rule key.
         if isinstance(value, list):
-            value = next(
-                (v for v in value if isinstance(v, str) and v in rules), None
-            )
+            value = next((v for v in value if isinstance(v, str) and v in rules), None)
         if not isinstance(value, str) or value not in rules:
             return
         signals += 1
